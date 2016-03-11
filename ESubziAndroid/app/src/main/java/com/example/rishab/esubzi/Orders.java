@@ -13,9 +13,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.rishab.esubzi.Volley.VolleyClick;
+
 
 public class Orders extends ActionBarActivity {
     ListView mRecyclerView;
+    String userId="56daf665a32c7f2c2ebda1a8";
+    String usertype="Customer";
 
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
@@ -32,8 +36,8 @@ public class Orders extends ActionBarActivity {
         actionBar.setBackgroundDrawable(colorDrawable);
 
         ListView listView=(ListView)findViewById(R.id.orders);
-        String[] items={"asdfdfds ","asdfdfds ","asdfdfds ","asdfdfds "};
-        String[] discounts={"asdfdfds ","asdfdfds ","asdfdfds ","asdfdfds "};
+        String[] items={"Delievery","Delivery"};
+        String[] discounts={"1st Priority","2nd priority"};
         OrderListAdapter adapter=new OrderListAdapter(items,discounts,this);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -25,6 +25,13 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+//import com.example.rishab.esubzi.Volley.VolleyClick;
+
+import com.example.rishab.esubzi.Volley.VolleyClick;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -74,6 +81,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
         View a= getLayoutInflater().inflate(R.layout.header,null,false);
+
         mRecyclerView.addHeaderView(a);
         mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
 
@@ -236,15 +244,32 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
     }
 
 
-    public void addProducts(View view){
-        EditText editText=(EditText)findViewById(R.id.item_name);
-        String name=(String)editText.getText().toString();
-        editText=(EditText)findViewById(R.id.item_price);
-        String price=(String)editText.getText().toString();
-        editText=(EditText)findViewById(R.id.item_discount);
-        String discount=(String)editText.getText().toString();
-        Spinner spinner=(Spinner) findViewById(R.id.spinner1);
-        String amount=spinner.getSelectedItem().toString();
+    public void addProduct(View view){
+        Intent intent=new Intent(this,Products.class);
+        startActivity(intent);
+//        EditText editText=(EditText)findViewById(R.id.item_name);
+//        String name=(String)editText.getText().toString();
+//        editText=(EditText)findViewById(R.id.item_price);
+//        String price=(String)editText.getText().toString();
+//        editText=(EditText)findViewById(R.id.item_discount);
+//        String discount=(String)editText.getText().toString();
+//        Spinner spinner=(Spinner) findViewById(R.id.spinner1);
+//        String amount=spinner.getSelectedItem().toString();
+//        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+//        VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, "Dfds", Integer.parseInt(discount));
+//        Intent intent=new Intent(this,Products.class);
+//        intent.putExtra("user_id","Dfds");
+//        startActivity(intent);
         //add the networking code here
+    }
+    public void fi(View view){
+
+     Intent intent=new Intent(this,Discounts.class);
+     startActivity(intent);
+    }
+    public void fin(View view){
+
+        Intent intent=new Intent(this,Orders.class);
+        startActivity(intent);
     }
 }

@@ -86,8 +86,18 @@ android:elevation="7dp">
                 android:textColor="#ffb40a98"
                 android:translationZ="20dp"
                 android:layout_alignParentBottom="true"
-                android:layout_toEndOf="@+id/button2" />
+                android:layout_toEndOf="@+id/button2"
+                android:onClick="fi" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancdsl"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="40dp"
+                android:textColor="#ffb40a98"
+                android:translationZ="20dp"
 
+                android:onClick="fin" />
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"

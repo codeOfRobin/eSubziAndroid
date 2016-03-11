@@ -7,21 +7,23 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.5"
         android:layout_marginTop="6dp"
-        android:background="#000">
+        android:background="#4D4FBC">
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="190dp"
-                android:src="@drawable/sample" />
+                android:src="@drawable/sample"
+                android:id="@+id/product_image" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Carrots"
                 android:textSize="30dp"
                 android:layout_centerVertical="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:id="@+id/product_text" />
         </RelativeLayout>
     </LinearLayout>
     <LinearLayout
@@ -32,18 +34,18 @@
         android:layout_marginTop="5dp"
         android:dividerPadding="2dp">
         <ImageButton
-            android:layout_width="33dp"
-            android:layout_height="33dp"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
             android:src="@drawable/ic_create_black_24dp"
             android:scaleType="fitXY" />
         <ImageButton
-            android:layout_width="33dp"
-            android:layout_height="33dp"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
             android:src="@drawable/ic_turned_in_black_24dp"
             android:scaleType="fitXY" />
         <ImageButton
-            android:layout_width="33dp"
-            android:layout_height="33dp"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
             android:src="@drawable/ic_share_black_24dp"
             android:scaleType="fitXY" />
     </LinearLayout>

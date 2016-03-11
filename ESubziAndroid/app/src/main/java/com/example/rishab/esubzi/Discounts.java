@@ -32,8 +32,8 @@ public class Discounts extends ActionBarActivity {
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
         actionBar.setBackgroundDrawable(colorDrawable);
         ListView listView=(ListView)findViewById(R.id.discount_list);
-        String[] items={"asdfdfds ","asdfdfds ","asdfdfds ","asdfdfds "};
-        String[] discounts={"asdfdfds ","asdfdfds ","asdfdfds ","asdfdfds "};
+        String[] items={"Carrots ","Radish","banana","others "};
+        String[] discounts={"2% off ","2% off ","20% off ","25% off ","26% off ",};
         DiscountListAdapter adapter=new DiscountListAdapter(items,discounts,this);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

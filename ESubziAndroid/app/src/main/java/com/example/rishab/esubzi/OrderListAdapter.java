@@ -15,7 +15,7 @@ public class OrderListAdapter extends BaseAdapter{
     String[] headings;
     String[] desc;
     Context context;
-    String[] colors={"#1b5e20","#aa00ff"};
+    String[] colors={"#A53ABD","#234E33"};
     public OrderListAdapter(String[] headings,String[] desc,Context context){
         super();
         this.desc=desc;

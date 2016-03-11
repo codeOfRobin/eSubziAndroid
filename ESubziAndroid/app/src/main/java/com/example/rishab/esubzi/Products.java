@@ -1,5 +1,6 @@
 package com.example.rishab.esubzi;
 
+import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,6 +11,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+
+import com.example.rishab.esubzi.Objects.ProductObject;
+import com.example.rishab.esubzi.Volley.VolleyClick;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
 public class Products extends ActionBarActivity {
@@ -22,18 +32,65 @@ public class Products extends ActionBarActivity {
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
 
+    JSONArray products;
+    JSONObject product;
+    String created_at = "";
+    String updated_at = "";
+    String userId = "";
+    int discount = 0;
+    String description = "";
+    int quantity = 0;
+    int price = 0;
+    String productId = "";
+    String message = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products);
+
+
+//        Intent intent=getIntent();
+//        String result=(String) intent.getStringExtra("data");
+        final ArrayList<ProductObject> productObjList = new ArrayList<ProductObject>();
+//        try {
+//            JSONObject resultJson = new JSONObject(result);
+//            if (resultJson.has("products")) {
+//                products = resultJson.getJSONArray("products");
+//                for (int i = 0; i < products.length(); i++) {
+//                    product = products.getJSONObject(i);
+//                    discount = product.getInt("discount");
+//                    quantity = product.getInt("quantity");
+//                    if (product.has("price")) {
+//                        price = product.getInt("price");
+//                    }
+//                    userId = product.getString("userId");
+//                    description = product.getString("description");
+//                    productId = product.getString("_id");
+//                    created_at = product.getString("created_at");
+//                    updated_at = product.getString("updated_at");
+//                    productObjList.add(new ProductObject(created_at, updated_at, userId, discount, description, quantity, price, productId));
+//                }
+//            }
+//        }
+//        catch(JSONException e){
+//
+//        }
         gridView=(GridView) findViewById(R.id.product_grid);
 
-        productsGridAdapter=new ProductsGridAdapter(this,count);
+        productsGridAdapter=new ProductsGridAdapter(this,count,productObjList);
         gridView.setAdapter(productsGridAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //you code for netwirking here
+//                Intent intent=new Intent(Products.this,ProductDetails.class);
+//                intent.putExtra("desc",productObjList.get(position).getDescription());
+//                intent.putExtra("discount",productObjList.get(position).getDiscount());
+//                intent.putExtra("price",productObjList.get(position).getPrice());
+//                intent.putExtra("quantity",productObjList.get(position).getQuantity());
+//                intent.putExtra("product_id",productObjList.get(position).getProductId());
+//                startActivity(intent);
             }
         });
 
