@@ -1,14 +1,14 @@
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <!--<item name="android:background">#46B419</item>-->
-        <item name="android:actionBarStyle">@style/MyTheme.ActionBarStyle</item>
         <item name="colorPrimary">#389014</item>
         <item name="colorPrimaryDark">#389014</item>
     </style>
+    <!-- Base application theme. -->
 
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="MyTheme.ActionBarStyle" parent="Base.Theme.AppCompat.Light.DarkActionBar">
 
         <item name="android:background">#46B419</item>

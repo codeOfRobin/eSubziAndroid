@@ -1,10 +1,12 @@
 package com.example.rishab.esubzi;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +16,8 @@ import android.widget.ListView;
 
 import com.example.rishab.esubzi.Objects.ProductObject;
 import com.example.rishab.esubzi.Volley.VolleyClick;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +26,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class Products extends ActionBarActivity {
+public class Products extends ActionBarActivity{
     GridView gridView;
     ProductsGridAdapter productsGridAdapter;
     int count;
@@ -43,16 +47,18 @@ public class Products extends ActionBarActivity {
     int price = 0;
     String productId = "";
     String message = "";
-
+    ArrayList<ProductObject> productObjects;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products);
 
+        Log.d("sdasdsa ",getIntent().getStringExtra("data"));
+        Intent intent=getIntent();
+        productObjects=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
+                new TypeToken<ArrayList<ProductObject>>() {
+                }.getType());
 
-//        Intent intent=getIntent();
-//        String result=(String) intent.getStringExtra("data");
-        final ArrayList<ProductObject> productObjList = new ArrayList<ProductObject>();
 //        try {
 //            JSONObject resultJson = new JSONObject(result);
 //            if (resultJson.has("products")) {
@@ -78,7 +84,7 @@ public class Products extends ActionBarActivity {
 //        }
         gridView=(GridView) findViewById(R.id.product_grid);
 
-        productsGridAdapter=new ProductsGridAdapter(this,count,productObjList);
+        productsGridAdapter=new ProductsGridAdapter(this,count,productObjects);
         gridView.setAdapter(productsGridAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -96,9 +102,51 @@ public class Products extends ActionBarActivity {
 
         mRecyclerView = (ListView) findViewById(R.id.products_nav); // Assigning the RecyclerView Object to the xml View
 
+        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
-        String[] list={"Discounts","Products","Order"};
-        NavListAdapter mAdapter = new NavListAdapter(this,list);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
+                Log.d("sheck",pref.getString("type",""));
+                Log.d("check",""+position);
+                if(position==1){
+                    if (pref.getString("type","").equals("Shopkeeper")) {
+                        VolleyClick.findProductsClick(pref.getString("userId",""), Products.this);
+                    } else {
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Products.this);
+                    }
+                }
+                else if(position==2){
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Products.this);
+                }
+                else if(position==3){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(Products.this, Login.class);
+                        Products.this.startActivity(intent);
+                    } else {
+                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Products.this);
+                    }
+                }
+                else if(position==4){
+                    Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                    Intent intent = new Intent(Products.this, Login.class);
+                    Products.this.startActivity(intent);
+                }
+            }
+        });
+        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        ArrayList<String> list=new ArrayList<String >();
+        list.add("Discounts/Products");
+        list.add("Order");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Log Out");
+        }
+        else{
+            list.add("Preferences");
+            list.add("Log Out");
+        }
+        NavListAdapter mAdapter = new NavListAdapter(this,list,pref.getString("userId",""),pref.getString("type",""));       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
         View a= getLayoutInflater().inflate(R.layout.header,null,false);
@@ -132,6 +180,8 @@ public class Products extends ActionBarActivity {
 
         }; // Drawer Toggle Object Made
         Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
+        mRecyclerView.bringToFront();
+        Drawer.requestLayout();
 //        Drawer.setOnItemClickListener()
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -161,4 +211,38 @@ public class Products extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    public  void addProduct(View view){
+        Intent intent = new Intent(this, AddProducts.class);
+        startActivity(intent);
+    }
+//    public void onItemClick(AdapterView<?> parent, View view, int position,
+//                               long id) {
+//        Log.d("fdfs","dfsfdsfgsfs");
+//        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+//        if(position==0){
+//            if (pref.getString("type","").equals("Shopkeeper")) {
+//                VolleyClick.findProductsClick(pref.getString("userId",""), Products.this);
+//            } else {
+//                VolleyClick.findDiscountsClick(pref.getString("userId",""), Products.this);
+//            }
+//        }
+//        else if(position==1){
+//            VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Products.this);
+//        }
+//        else if(position==2){
+//            if (pref.getString("type", "").equals("Shopkeeper")) {
+//                this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+//                Intent intent = new Intent(Products.this, Login.class);
+//                Products.this.startActivity(intent);
+//            } else {
+//                VolleyClick.findPreferencesClick(pref.getString("userId",""), Products.this);
+//            }
+//        }
+//        else if(position==3){
+//            this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+//            Intent intent = new Intent(Products.this, Login.class);
+//            Products.this.startActivity(intent);
+//        }
+//    }
+
 }

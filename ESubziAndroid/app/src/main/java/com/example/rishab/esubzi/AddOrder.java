@@ -1,26 +1,18 @@
 package com.example.rishab.esubzi;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.rishab.esubzi.Objects.ProductObject;
 import com.example.rishab.esubzi.Volley.VolleyClick;
@@ -28,76 +20,36 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
-public class Discounts extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
-    ListView mRecyclerView;
+public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSelectedListener{
     ArrayList<ProductObject> productObjList;
+    ArrayList<String> productIds;
+    ArrayList<Float> quantities;
+    ListView mRecyclerView;
+
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
+
+    public static HashMap<String,Float> data=new HashMap<String ,Float>();
+    ArrayList<ProductObject> productObjects;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_discounts);
-       // ActionBar actionBar;
+        setContentView(R.layout.activity_add_order);
+        productIds=new ArrayList<String>();
+        quantities=new ArrayList<Float>();
         productObjList=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
                 new TypeToken<ArrayList<ProductObject>>() {
                 }.getType());
+        Log.d("size",""+productObjList.size());
 
+        mRecyclerView = (ListView) findViewById(R.id.order_nav); // Assigning the RecyclerView Object to the xml View
 
-        //actionBar = getSupportActionBar();
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
-        //actionBar.setBackgroundDrawable(colorDrawable);
-        ListView listView=(ListView)findViewById(R.id.discount_list);
-        String[] items={"Carrots ","Radish","banana","others "};
-        String[] discounts={"2% off ","2% off ","20% off ","25% off ","26% off ",};
-        if(productObjList.size()>0) {
-            DiscountListAdapter adapter = new DiscountListAdapter(productObjList, this);
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //add youR code code for networking here
-                }
-            });
-
-        }
-
-        mRecyclerView = (ListView) findViewById(R.id.discount_nav); // Assigning the RecyclerView Object to the xml View
-        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-
-                Log.d("sheck",pref.getString("type",""));
-                Log.d("check",""+position);
-                if(position==1){
-                    if (pref.getString("type","").equals("Shopkeeper")) {
-                        VolleyClick.findProductsClick(pref.getString("userId", ""), Discounts.this);
-                    } else {
-                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Discounts.this);
-                    }
-                }
-                else if(position==2){
-                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Discounts.this);
-                }
-                else if(position==3){
-                    if (pref.getString("type", "").equals("Shopkeeper")) {
-                        Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Discounts.this, Login.class);
-                        Discounts.this.startActivity(intent);
-                    } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Discounts.this);
-                    }
-                }
-                else if(position==4){
-                    Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(Discounts.this, Login.class);
-                    Discounts.this.startActivity(intent);
-                }
-            }
-        });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
         list.add("Discounts/Products");
@@ -149,12 +101,27 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        ListView listView=(ListView) findViewById(R.id.place_order_list);
+        AddOrderAdapter adapter=new AddOrderAdapter(productObjList,this);
+        listView.setAdapter(adapter);
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                productIds.add(productObjects.get(position).getProductId());
+//                TextView textView = (TextView) parent.findViewById(R.id.order_quantity);
+//                quantities.add(Float.parseFloat(textView.getText().toString()));
+//            }
+//        });
+
+
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_discounts, menu);
+        getMenuInflater().inflate(R.menu.menu_add_order, menu);
         return true;
     }
 
@@ -175,33 +142,37 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
         return super.onOptionsItemSelected(item);
     }
     public void placeOrder(View view){
-        Intent intent=new Intent(this,AddOrder.class);
-        Log.d("ghhjk",new Gson().toJson(productObjList));
-        intent.putExtra("data",new Gson().toJson(productObjList));
-        startActivity(intent);
-    }
-
-
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.products) {
-
-        } else if (id == R.id.order) {
-
-
-        } else if (id == R.id.preferences) {
-
-
-        } else if (id == R.id.logout) {
-
-
+//        for (int i=0;i<productObjList.size();i++){
+//            Log.d("ds","dss");
+//            ListView listView=(ListView) findViewById(R.id.place_order_list);
+//            Log.d("fdsfsdfs"," "+listView.getCount()+productObjList.size());
+//            TextView textView =(TextView) listView.get.findViewById(R.id.amt);
+//            Float amt=Float.parseFloat(textView.getText().toString());
+//            if(amt>0.0){
+//                productIds.add(productObjList.get(i).getProductId());
+//                quantities.add(amt);
+//            }
+//        }
+        Log.d("size", "" + data.size());
+        Iterator it = data.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            productIds.add(pair.getKey().toString());
+            quantities.add((Float)pair.getValue());
+            System.out.println(pair.getKey() + " = " + pair.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        Log.d("rajar",Integer.toString(productIds.size()));
+        VolleyClick.placeOrderClick(pref.getString("userId"," "), productIds, quantities,this);
+    }
+    public void onItemSelected(AdapterView<?> parent, View view, int position,
+                               long id) {
+        int a=2;
+    }
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
+
     }
 }

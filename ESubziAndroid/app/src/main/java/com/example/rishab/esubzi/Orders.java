@@ -1,5 +1,7 @@
 package com.example.rishab.esubzi;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.widget.DrawerLayout;
@@ -7,20 +9,27 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.rishab.esubzi.Objects.OrderObject;
+import com.example.rishab.esubzi.Objects.ProductObject;
 import com.example.rishab.esubzi.Volley.VolleyClick;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
 
 
 public class Orders extends ActionBarActivity {
     ListView mRecyclerView;
     String userId="56daf665a32c7f2c2ebda1a8";
     String usertype="Customer";
-
+    ArrayList<OrderObject> orderObjList;
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
@@ -30,7 +39,10 @@ public class Orders extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
         ActionBar actionBar;
-
+        orderObjList=(ArrayList<OrderObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
+                new TypeToken<ArrayList<OrderObject>>() {
+                }.getType());
+        Log.d("ffdgdgf", getIntent().getStringExtra("data"));
         actionBar = getSupportActionBar();
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
         actionBar.setBackgroundDrawable(colorDrawable);
@@ -38,7 +50,7 @@ public class Orders extends ActionBarActivity {
         ListView listView=(ListView)findViewById(R.id.orders);
         String[] items={"Delievery","Delivery"};
         String[] discounts={"1st Priority","2nd priority"};
-        OrderListAdapter adapter=new OrderListAdapter(items,discounts,this);
+        OrderListAdapter adapter=new OrderListAdapter(orderObjList,this);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -49,13 +61,55 @@ public class Orders extends ActionBarActivity {
 
 
         mRecyclerView = (ListView) findViewById(R.id.orders_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                Log.d("sheck",pref.getString("type",""));
+                Log.d("check",""+position);
+                if(position==1){
+                    if (pref.getString("type","").equals("Shopkeeper")) {
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), Orders.this);
+                    } else {
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Orders.this);
+                    }
+                }
+                else if(position==2){
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Orders.this);
+                }
+                else if(position==3){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        Orders.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(Orders.this, Login.class);
+                        Orders.this.startActivity(intent);
+                    } else {
+                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Orders.this);
+                    }
+                }
+                else if(position==4){
+                    Orders.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                    Intent intent = new Intent(Orders.this, Login.class);
+                    Orders.this.startActivity(intent);
+                }
+            }
+        });
+        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        ArrayList<String> list=new ArrayList<String >();
+        list.add("Discounts/Orders");
+        list.add("Order");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Log Out");
+        }
+        else{
+            list.add("Preferences");
+            list.add("Log Out");
+        }
 
-
-        String[] list={"Discounts","Products","Order"};
-        NavListAdapter mAdapter = new NavListAdapter(this,list);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
+        NavListAdapter mAdapter = new NavListAdapter(this,list,pref.getString("userId",""),pref.getString("type",""));       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
         View a= getLayoutInflater().inflate(R.layout.header,null,false);
+
         mRecyclerView.addHeaderView(a);
         mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
 

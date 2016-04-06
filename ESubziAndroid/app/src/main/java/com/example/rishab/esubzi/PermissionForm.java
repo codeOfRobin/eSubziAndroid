@@ -2,69 +2,59 @@ package com.example.rishab.esubzi;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.rishab.esubzi.Objects.ProductObject;
+import com.example.rishab.esubzi.Objects.ShopObject;
 import com.example.rishab.esubzi.Volley.VolleyClick;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class Discounts extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class PermissionForm extends ActionBarActivity implements AdapterView.OnItemSelectedListener{
+                                     // Declaring DrawerLayout
     ListView mRecyclerView;
-    ArrayList<ProductObject> productObjList;
+
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
+
+
+    public static ArrayList<String> app_shops_id=new ArrayList<String>();
+    public static ArrayList<String> n_app_shops_id=new ArrayList<String>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_discounts);
-       // ActionBar actionBar;
-        productObjList=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
-                new TypeToken<ArrayList<ProductObject>>() {
-                }.getType());
+        setContentView(R.layout.activity_permission_form);
+        ArrayList<ShopObject> test=new ArrayList<ShopObject>();
+        ShopObject d=new ShopObject("1","safal");
+        test.add(d);
+        test.add(d);
+        test.add(d);
 
 
-        //actionBar = getSupportActionBar();
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
-        //actionBar.setBackgroundDrawable(colorDrawable);
-        ListView listView=(ListView)findViewById(R.id.discount_list);
-        String[] items={"Carrots ","Radish","banana","others "};
-        String[] discounts={"2% off ","2% off ","20% off ","25% off ","26% off ",};
-        if(productObjList.size()>0) {
-            DiscountListAdapter adapter = new DiscountListAdapter(productObjList, this);
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //add youR code code for networking here
-                }
-            });
-
-        }
-
-        mRecyclerView = (ListView) findViewById(R.id.discount_nav); // Assigning the RecyclerView Object to the xml View
+        ListView listView=(ListView) findViewById(R.id.shopkeeper_list);
+        PermissionsAdapter adapter=new PermissionsAdapter(test,this);
+        listView.setAdapter(adapter);
+//        mRecyclerView = (RecyclerView) findViewById(R.id.shop_list);
+//        mRecyclerView.setHasFixedSize(true);
+//        mLayoutManager = new LinearLayoutManager(this);
+//        mRecyclerView.setLayoutManager(mLayoutManager);
+//        mAdapter = new PermissionsAdapter(test);
+//        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView = (ListView) findViewById(R.id.permission_nav); // Assigning the RecyclerView Object to the xml View
         mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -74,27 +64,27 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
                 Log.d("check",""+position);
                 if(position==1){
                     if (pref.getString("type","").equals("Shopkeeper")) {
-                        VolleyClick.findProductsClick(pref.getString("userId", ""), Discounts.this);
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), PermissionForm.this);
                     } else {
-                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Discounts.this);
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), PermissionForm.this);
                     }
                 }
                 else if(position==2){
-                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Discounts.this);
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), PermissionForm.this);
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Discounts.this, Login.class);
-                        Discounts.this.startActivity(intent);
+                        PermissionForm.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(PermissionForm.this, Login.class);
+                        PermissionForm.this.startActivity(intent);
                     } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Discounts.this);
+                        VolleyClick.findPreferencesClick(pref.getString("userId",""), PermissionForm.this);
                     }
                 }
                 else if(position==4){
-                    Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(Discounts.this, Login.class);
-                    Discounts.this.startActivity(intent);
+                    PermissionForm.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                    Intent intent = new Intent(PermissionForm.this, Login.class);
+                    PermissionForm.this.startActivity(intent);
                 }
             }
         });
@@ -154,7 +144,7 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_discounts, menu);
+        getMenuInflater().inflate(R.menu.menu_permission_form, menu);
         return true;
     }
 
@@ -174,34 +164,18 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
         }
         return super.onOptionsItemSelected(item);
     }
-    public void placeOrder(View view){
-        Intent intent=new Intent(this,AddOrder.class);
-        Log.d("ghhjk",new Gson().toJson(productObjList));
-        intent.putExtra("data",new Gson().toJson(productObjList));
-        startActivity(intent);
+    public void send(View view){
+        Log.d("size",""+app_shops_id.size());
+        Log.d("size", "" + n_app_shops_id.size());
     }
 
-
-
+    public void onItemSelected(AdapterView<?> parent, View view, int position,
+                               long id) {
+        int a=2;
+    }
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
 
-        if (id == R.id.products) {
-
-        } else if (id == R.id.order) {
-
-
-        } else if (id == R.id.preferences) {
-
-
-        } else if (id == R.id.logout) {
-
-
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 }

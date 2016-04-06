@@ -1,5 +1,6 @@
 package com.example.rishab.esubzi;
 
+import android.content.SharedPreferences;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.zip.Inflater;
 
 
@@ -35,8 +37,18 @@ public class NavDrawer extends ActionBarActivity {
         mRecyclerView = (ListView) findViewById(R.id.RecyclerView); // Assigning the RecyclerView Object to the xml View
 
 
-        String[] list={"Discounts","Products","Order"};
-        NavListAdapter mAdapter = new NavListAdapter(this,list);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
+        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        ArrayList<String> list=new ArrayList<String >();
+        list.add("Discounts/Products");
+        list.add("Order");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Log Out");
+        }
+        else{
+            list.add("Preferences");
+            list.add("Log Out");
+        }
+        NavListAdapter mAdapter = new NavListAdapter(this,list,pref.getString("userId",""),pref.getString("type",""));       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
         View a= getLayoutInflater().inflate(R.layout.header,null,false);

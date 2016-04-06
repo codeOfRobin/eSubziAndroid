@@ -33,7 +33,8 @@ android:elevation="7dp">
             android:layout_alignParentRight="true"
             android:layout_marginBottom="24dp"
             android:layout_marginRight="24dp"
-            android:translationZ="30dp" />
+            android:translationZ="30dp"
+            android:onClick="addProduct"/>
 
     </RelativeLayout>
 
@@ -43,7 +44,7 @@ android:elevation="7dp">
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-
+        android:choiceMode="singleChoice"
         android:background="#ffffff"
         android:scrollbars="vertical">
 
