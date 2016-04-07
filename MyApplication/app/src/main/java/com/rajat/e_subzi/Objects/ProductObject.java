@@ -1,12 +1,9 @@
 package com.rajat.e_subzi.Objects;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * Created by Rajat on 05-03-2016.
  */
-public class ProductObject implements Parcelable {
+public class ProductObject {
     String created_at= "";
     String updated_at= "";
     String userId= "";
@@ -90,45 +87,4 @@ public class ProductObject implements Parcelable {
     public void setProductId(String productId) {
         this.productId = productId;
     }
-
-    protected ProductObject(Parcel in) {
-        created_at = in.readString();
-        updated_at = in.readString();
-        userId = in.readString();
-        discount = in.readInt();
-        description = in.readString();
-        quantity = in.readInt();
-        price = in.readInt();
-        productId = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(created_at);
-        dest.writeString(updated_at);
-        dest.writeString(userId);
-        dest.writeInt(discount);
-        dest.writeString(description);
-        dest.writeInt(quantity);
-        dest.writeInt(price);
-        dest.writeString(productId);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<ProductObject> CREATOR = new Parcelable.Creator<ProductObject>() {
-        @Override
-        public ProductObject createFromParcel(Parcel in) {
-            return new ProductObject(in);
-        }
-
-        @Override
-        public ProductObject[] newArray(int size) {
-            return new ProductObject[size];
-        }
-    };
 }

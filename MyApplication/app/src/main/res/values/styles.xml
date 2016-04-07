@@ -8,7 +8,9 @@
         <item name="colorPrimary">#389014</item>
         <item name="colorPrimaryDark">#389014</item>
     </style>
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="MyTheme.ActionBarStyle" parent="Base.Theme.AppCompat.Light.DarkActionBar">
 
         <item name="android:background">#46B419</item>

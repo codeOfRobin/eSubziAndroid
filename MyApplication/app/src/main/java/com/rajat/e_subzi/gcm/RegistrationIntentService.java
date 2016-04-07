@@ -27,6 +27,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.rajat.e_subzi.Discounts;
 import com.rajat.e_subzi.R;
 import com.rajat.e_subzi.Volley.VolleyClick;
 
@@ -89,7 +90,7 @@ public class RegistrationIntentService extends IntentService {
      */
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
-        //VolleyClick.registerDeviceClick(token, "rajat.surana15@gmail.com", "Android", MainActivity.context);
+        VolleyClick.registerDeviceClick(token, getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("email",""), "Android", Discounts.context);
 
     }
 

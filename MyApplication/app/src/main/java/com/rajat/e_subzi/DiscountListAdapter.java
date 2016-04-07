@@ -1,4 +1,4 @@
-package com.rajat.e_subzi.ui;
+package com.rajat.e_subzi;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,25 +6,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import com.rajat.e_subzi.Volley.VolleyClick;
-import com.rajat.e_subzi.R;
+
+import com.rajat.e_subzi.Objects.ProductObject;
+
+import java.util.ArrayList;
+
 /**
  * Created by Rishab on 02-03-2016.
  */
 public class DiscountListAdapter extends BaseAdapter {
-    String[] items;
-    String[] discounts;
+
+    ArrayList<ProductObject> discounts=new ArrayList<ProductObject>();
     Context context;
-    public DiscountListAdapter(String[] items,String[] discounts,Context context){
+    public DiscountListAdapter(ArrayList<ProductObject> discounts,Context context){
         super();
         this.discounts=discounts;
-        this.items=items;
+
         this.context=context;
     }
 
     public int getCount() {
         // TODO Auto-generated method stub
-        return items.length;
+        return discounts.size();
     }
 
     public Object getItem(int position) {
@@ -40,9 +43,12 @@ public class DiscountListAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.discount_list_view, null, true);
         TextView data = (TextView) row.findViewById(R.id.commodity);
-        data.setText(items[position]);
+
+        data.setText(discounts.get(position).getDescription());
+        data=(TextView)row.findViewById(R.id.price);
+        data.setText("Price : "+Integer.toString(discounts.get(position).getPrice()));
         data=(TextView)row.findViewById(R.id.discount);
-        data.setText(discounts[position]);
+        data.setText("Discount : "+Integer.toString(discounts.get(position).getDiscount()));
         return row;
     }
 }

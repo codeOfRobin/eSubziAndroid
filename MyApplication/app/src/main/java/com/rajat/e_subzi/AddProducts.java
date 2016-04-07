@@ -1,17 +1,18 @@
-package com.rajat.e_subzi.ui;
+package com.rajat.e_subzi;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Menu;
@@ -19,23 +20,39 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+//import com.example.rishab.esubzi.Volley.VolleyClick;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
+import com.rajat.e_subzi.Tools.MultipartRequest;
+import com.rajat.e_subzi.Volley.VolleyClick;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
-import com.rajat.e_subzi.Volley.VolleyClick;
-import com.rajat.e_subzi.R;
-//import com.example.rishab.esubzi.Volley.VolleyClick;
+import java.util.Map;
+
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.TransformerException;
 
 
 public class AddProducts extends ActionBarActivity implements AdapterView.OnItemSelectedListener {
-    private String[] dropDown={"1","2","3","4","5","6","7","8","9","10","11","12","13","14"};
+    private String[] dropDown={"Quantity(in kgs):","1","2","3","4","5","6","7","8","9","10","11","12","13","14"};
     Spinner spinner;
+    public static SharedPreferences pref;
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_IMAGE = 1;
@@ -55,7 +72,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_products);
         ActionBar actionBar;
-
+        pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         actionBar = getSupportActionBar();
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
         actionBar.setBackgroundDrawable(colorDrawable);
@@ -71,8 +88,18 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         mRecyclerView = (ListView) findViewById(R.id.add_nav); // Assigning the RecyclerView Object to the xml View
 
 
-        String[] list={"Discounts","Products","Order"};
-        NavListAdapter mAdapter = new NavListAdapter(this,list);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
+        ArrayList<String> list=new ArrayList<String >();
+        list.add("Discounts/Products");
+        list.add("Order");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Log Out");
+        }
+        else{
+            list.add("Preferences");
+            list.add("Log Out");
+        }
+
+        NavListAdapter mAdapter = new NavListAdapter(this,list,pref.getString("userId",""),pref.getString("type",""));       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
         View a= getLayoutInflater().inflate(R.layout.header,null,false);
@@ -240,31 +267,42 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
 
 
     public void addProduct(View view){
-        Intent intent=new Intent(this,Products.class);
-        startActivity(intent);
-//        EditText editText=(EditText)findViewById(R.id.item_name);
-//        String name=(String)editText.getText().toString();
-//        editText=(EditText)findViewById(R.id.item_price);
-//        String price=(String)editText.getText().toString();
-//        editText=(EditText)findViewById(R.id.item_discount);
-//        String discount=(String)editText.getText().toString();
-//        Spinner spinner=(Spinner) findViewById(R.id.spinner1);
-//        String amount=spinner.getSelectedItem().toString();
-//        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-//        VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, "Dfds", Integer.parseInt(discount));
-//        Intent intent=new Intent(this,Products.class);
-//        intent.putExtra("user_id","Dfds");
-//        startActivity(intent);
+
+        Map<String,String> params=new HashMap<String, String>();
+        params.put("ShopkeeperId",pref.getString("userId",""));
+        Response.Listener<String> mListener=new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("rishab","sdasda");
+            }
+        };
+        MultipartRequest.MultipartProgressListener listener=new MultipartRequest.MultipartProgressListener() {
+            @Override
+            public void transferred(long transfered, int progress) {
+                Log.d("rishab prog",""+transfered+"  "+progress);
+            }
+        };
+        Response.ErrorListener err=new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("err",error.toString());
+            }
+        };
+
+        EditText editText=(EditText)findViewById(R.id.item_name);
+        String name=(String)editText.getText().toString();
+        editText=(EditText)findViewById(R.id.item_price);
+        String price=(String)editText.getText().toString();
+        editText=(EditText)findViewById(R.id.item_discount);
+        String discount=(String)editText.getText().toString();
+        Spinner spinner=(Spinner) findViewById(R.id.spinner1);
+        String amount=spinner.getSelectedItem().toString();
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId","0"), Integer.parseInt(discount),this,file,params,mListener,err,listener);
+
         //add the networking code here
     }
-    public void fi(View view){
-
-     Intent intent=new Intent(this,Discounts.class);
-     startActivity(intent);
-    }
-    public void fin(View view){
-
-        Intent intent=new Intent(this,Orders.class);
-        startActivity(intent);
+    public void canncel(View view){
+        this.finish();
     }
 }

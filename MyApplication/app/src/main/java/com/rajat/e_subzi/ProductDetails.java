@@ -1,37 +1,38 @@
-package com.rajat.e_subzi.ui;
+package com.rajat.e_subzi;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
-import com.rajat.e_subzi.R;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
 
 
 public class ProductDetails extends ActionBarActivity {
-    String desc="";
-    String price="";
-    String discount="";
-    String quantity="";
-    String p_id="";
+    ProductObject product;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_details);
         Intent intent=getIntent();
-        desc=intent.getStringExtra("desc");
-        price=intent.getStringExtra("price");
-        discount=intent.getStringExtra("discount");
-        quantity=intent.getStringExtra("quantiy");
-        p_id=intent.getStringExtra("p_id");
+        product=(ProductObject) new Gson().fromJson((String) intent.getStringExtra("data"), ProductObject.class);
         EditText edittext=(EditText)findViewById(R.id.p_desc);
-        edittext.setText(desc);
+        edittext.setText(product.getDescription());
         edittext=(EditText)findViewById(R.id.p_discount);
-        edittext.setText(discount);
+        edittext.setText(Integer.toString(product.getDiscount()));
+
         edittext.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -47,9 +48,17 @@ public class ProductDetails extends ActionBarActivity {
             public void afterTextChanged(Editable s) {
                 EditText editText = (EditText) findViewById(R.id.p_discount);
                 String discount = editText.getText().toString();
-                editText = (EditText) findViewById(R.id.p_id);
+                editText = (EditText) findViewById(R.id.p_discount);
                 discount = editText.getText().toString();
-                VolleyClick.changeDiscountClick(p_id, Integer.parseInt(discount),ProductDetails.this);
+
+                try{
+                    int we=Integer.parseInt(discount);
+                    VolleyClick.changeDiscountClick(product.getProductId(), Integer.parseInt(discount), ProductDetails.this);
+                }
+                catch (Exception e){
+                    Toast.makeText(ProductDetails.this, "Please enter valid price",
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
         edittext=(EditText)findViewById(R.id.p_price);
@@ -67,13 +76,20 @@ public class ProductDetails extends ActionBarActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 EditText editText=(EditText)findViewById(R.id.p_price);
-                price=editText.getText().toString();
-                VolleyClick.updatePriceClick(p_id, Integer.parseInt(price),ProductDetails.this);
+                try{
+                    int we=Integer.parseInt(editText.getText().toString());
+                    VolleyClick.updatePriceClick(product.getProductId(), Integer.parseInt(editText.getText().toString()),ProductDetails.this);
+                }
+                catch (Exception e){
+                    Toast.makeText(ProductDetails.this, "Please enter valid price",
+                            Toast.LENGTH_LONG).show();
+                }
+
             }
         });
-        edittext.setText(price);
+        edittext.setText(Integer.toString(product.getPrice()));
         edittext=(EditText)findViewById(R.id.p_quantity);
-        edittext.setText(quantity);
+        edittext.setText(Integer.toString(product.getQuantity()));
 
 
     }
@@ -98,5 +114,9 @@ public class ProductDetails extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    public void done(View view){
+        this.finish();
+        VolleyClick.findProductsClick(getSharedPreferences("MyPrefs",MODE_PRIVATE).getString("userId",""), this);
     }
 }

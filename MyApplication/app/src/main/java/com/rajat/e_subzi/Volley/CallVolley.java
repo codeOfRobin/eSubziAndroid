@@ -10,15 +10,21 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+
+import com.google.gson.Gson;
+import com.rajat.e_subzi.AddProducts;
 import com.rajat.e_subzi.LoginActivity;
+import com.rajat.e_subzi.Tools.MultipartRequest;
 import com.rajat.e_subzi.Tools.Tools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -136,8 +142,10 @@ public class CallVolley {
                 //get instance of volleysingleton and add reuest to the queue
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
-        public static void createProductCall(String url, final Context context,final int price ,final int quantity,final String description,final String userId ,final int discount,final int Number)
+        public static void createProductCall(String url, final Context context,final int price ,final int quantity,final String description,final String userId ,final int discount,final int Number,final File file, final Map<String,String> pprams,
+                                             final Response.Listener<String> mlistener,final Response.ErrorListener err, final MultipartRequest.MultipartProgressListener listener)
         {
+
                 pDialog=  Tools.showProgressBar(context);
 
                 StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
@@ -149,8 +157,8 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.CreateProductApiJsonParser(response, context);
-
+                                        JSONParser.CreateProductApiJsonParser(response, context, file, pprams, mlistener, err, listener);
+//                                        JSONParser.FindProductsApiJsonParser(response, context);
                                         pDialog.dismiss();
                                 }
                                 catch (Exception localException)
@@ -174,7 +182,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", AddProducts.pref.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -237,7 +245,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -249,6 +257,117 @@ public class CallVolley {
                                 Map<String, String> params = new HashMap<>();
 
                                 params.put("userId",userId);
+                                return params;
+                        }
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+
+        public static void findDiscountsCall(String url, final Context context,final String userId,final int Number)
+        {
+//                pDialog=  Tools.showProgressBar(context);
+
+                StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
+                                        Log.i("rajat_  ", " onResponseActive " + response);
+                                        JSONParser.FindDiscountsApiJsonParser(response, context);
+
+                                        pDialog.dismiss();
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getApplicationContext().getSharedPreferences("MyPrefs", context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+        public static void registerDeviceCall(String url, final Context context,final String regId,final String email,final String type,final int Number)
+        {
+                //pDialog=  Tools.showProgressBar(context);
+
+                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        JSONParser.RegisterApiJsonParser(response, context);
+
+                                        //pDialog.dismiss();
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                //pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getApplicationContext().getSharedPreferences("MyPrefs", context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+                        @Override
+                        public String getBodyContentType() {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+
+                                params.put("regId",regId);
+                                params.put("type",type);
+                                params.put("email",email);
                                 return params;
                         }
                 };
@@ -296,7 +415,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -356,7 +475,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs",context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -378,7 +497,7 @@ public class CallVolley {
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
 
-        public static void placeOrderCall(String url, final Context context,final String customerId,final String[] productIds,final int[] quantities,final int Number)
+        public static void placeOrderCall(String url, final Context context,final String customerId,final ArrayList<String> productIds,final ArrayList<Float> quantities,final int Number)
         {
                 pDialog=  Tools.showProgressBar(context);
 
@@ -416,7 +535,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -428,13 +547,20 @@ public class CallVolley {
                                 Map<String, String> params = new HashMap<>();
                                 JSONArray productIdsArr=new JSONArray();
                                 JSONArray quantitiesArr= new JSONArray();
-                                for(int x=0;x<productIds.length;x++){
-                                        productIdsArr.put(productIds[x]);
-                                        quantitiesArr.put(quantities[x]);
+                                for(int x=0;x<productIds.size();x++){
+                                        productIdsArr.put(productIds.get(x));
+                                        quantitiesArr.put(quantities.get(x)+"");
                                 }
+                                String[] prods=new String[productIds.size()];
+                                        productIds.toArray(prods);
+                                Float[] quans=new Float[quantities.size()];
+                                quantities.toArray(quans);
+                               // JSONObject pro = new JSONObject(prods);
+                                JSONArray pro = new JSONArray(productIds);
+                                JSONArray quo =new JSONArray(quantities);
                                 params.put("customerId",customerId);
-                                params.put("productIds",productIdsArr.toString());
-                                params.put("quantityVals",quantitiesArr.toString());
+                                params.put("productIds",pro.toString());
+                                params.put("quantityVals",quo.toString());
                                 return params;
                         }
                 };
@@ -483,7 +609,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -538,6 +664,7 @@ public class CallVolley {
                         public void onErrorResponse(VolleyError error)
                         {
                                 Log.i("rajat", "onErrorResponse" + error.toString());
+
                                 pDialog.dismiss();
                         }
                 }){
@@ -545,7 +672,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -591,9 +718,9 @@ public class CallVolley {
                 return generatedPassword;
         }
 
-        public static void registerDeviceCall(String url, final Context context,final String regId,final String email,final String type,final int Number)
+        public static void changePreferencesCall(String url, final Context context,final String userId, final ArrayList<String> shops,final int Number)
         {
-                //pDialog=  Tools.showProgressBar(context);
+                pDialog=  Tools.showProgressBar(context);
 
                 StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
                 {
@@ -604,9 +731,9 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.RegisterApiJsonParser(response, context);
+//                                        JSONParser.ChangePreferencesApiJsonParser(response, context);
 
-                                        //pDialog.dismiss();
+                                        pDialog.dismiss();
                                 }
                                 catch (Exception localException)
                                 {
@@ -622,14 +749,14 @@ public class CallVolley {
                         public void onErrorResponse(VolleyError error)
                         {
                                 Log.i("rajat", "onErrorResponse" + error.toString());
-                                //pDialog.dismiss();
+                                pDialog.dismiss();
                         }
                 }){
                         @Override
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                              //  mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -639,10 +766,8 @@ public class CallVolley {
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
                                 Map<String, String> params = new HashMap<>();
-
-                                params.put("regId",regId);
-                                params.put("type",type);
-                                params.put("email",email);
+                                params.put("userId",userId);
+                                params.put("shops",shops.toString());
                                 return params;
                         }
                 };
@@ -653,9 +778,9 @@ public class CallVolley {
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
 
-        public static void createDiscountCall(String url, final Context context,final String shopId,final String disconutDesc,final int Number)
+        public static void findPreferencesCall(String url, final Context context,final String userId,final int Number)
         {
-                //pDialog=  Tools.showProgressBar(context);
+                pDialog=  Tools.showProgressBar(context);
 
                 StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
                 {
@@ -666,9 +791,9 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.CreateDiscountJsonParser(response, context);
+//                                        JSONParser.FindPreferencesApiJsonParser(response, context);
 
-                                        //pDialog.dismiss();
+                                        pDialog.dismiss();
                                 }
                                 catch (Exception localException)
                                 {
@@ -684,14 +809,14 @@ public class CallVolley {
                         public void onErrorResponse(VolleyError error)
                         {
                                 Log.i("rajat", "onErrorResponse" + error.toString());
-                                //pDialog.dismiss();
+                                pDialog.dismiss();
                         }
                 }){
                         @Override
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                //  mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -702,61 +827,11 @@ public class CallVolley {
                         protected Map<String, String> getParams() throws AuthFailureError {
                                 Map<String, String> params = new HashMap<>();
 
-                                params.put("shopKeeperId",shopId);
-                                params.put("discountDescription",disconutDesc);
-                                //params.put("email",email);
+                                params.put("userId",userId);
+
+
                                 return params;
                         }
-                };
-
-                //how many times to try and for how much duration
-                setCustomRetryPolicy(request);
-                //get instance of volleysingleton and add reuest to the queue
-                VolleySingleton.getInstance(context).addToRequestQueue(request);
-        }
-
-        public static void getDiscountsCall(String url, final Context context,final int Number)
-        {
-                //pDialog=  Tools.showProgressBar(context);
-
-                StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>()
-                {
-                        // if a reponse is recieved after sending request
-                        @Override
-                        public void onResponse(String response)
-                        {
-                                try
-                                {
-                                        Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.GetDiscountsJsonParser(response, context);
-
-                                        //pDialog.dismiss();
-                                }
-                                catch (Exception localException)
-                                {
-                                        Log.i("rajat"," onResponseException "+localException.getMessage());
-                                        localException.printStackTrace();
-                                }
-                        }
-                }
-                        , new Response.ErrorListener()
-                {
-                        //if error occurs
-                        @Override
-                        public void onErrorResponse(VolleyError error)
-                        {
-                                Log.i("rajat", "onErrorResponse" + error.toString());
-                                //pDialog.dismiss();
-                        }
-                }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                                //Log.i("size in getHeader: ",myHeaders.size()+"");
-                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                //  mHeaders.put("x-access-token", LoginActivity.sharedpreferences.getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
-                                return mHeaders;
-                        }
-
                 };
 
                 //how many times to try and for how much duration

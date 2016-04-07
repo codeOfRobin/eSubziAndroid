@@ -13,17 +13,19 @@
             android:layout_height="wrap_content">
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="190dp"
-                android:src="@drawable/sample"
+                android:layout_height="123dp"
+                android:background="@color/white"
                 android:id="@+id/product_image" />
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Carrots"
+                android:textAlignment="center"
                 android:textSize="30dp"
                 android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:id="@+id/product_text" />
+
+                android:id="@+id/product_text"
+                android:gravity="center_horizontal" />
         </RelativeLayout>
     </LinearLayout>
     <LinearLayout
@@ -37,16 +39,13 @@
             android:layout_width="53dp"
             android:layout_height="53dp"
             android:src="@drawable/ic_create_black_24dp"
-            android:scaleType="fitXY" />
+            android:scaleType="fitXY"
+           android:id="@+id/edit_product"/>
         <ImageButton
             android:layout_width="53dp"
             android:layout_height="53dp"
             android:src="@drawable/ic_turned_in_black_24dp"
             android:scaleType="fitXY" />
-        <ImageButton
-            android:layout_width="53dp"
-            android:layout_height="53dp"
-            android:src="@drawable/ic_share_black_24dp"
-            android:scaleType="fitXY" />
+
     </LinearLayout>
 </LinearLayout>

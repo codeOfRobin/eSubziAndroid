@@ -1,16 +1,18 @@
-package com.rajat.e_subzi.ui;
+package com.rajat.e_subzi;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rajat.e_subzi.Objects.ProductObject;
-import com.rajat.e_subzi.Volley.VolleyClick;
-import com.rajat.e_subzi.R;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -29,7 +31,7 @@ public class ProductsGridAdapter extends BaseAdapter {
 
     public int getCount() {
         // TODO Auto-generated method stub
-        return 5;
+        return productObjList.size();
     }
 
     public Object getItem(int position) {
@@ -41,13 +43,22 @@ public class ProductsGridAdapter extends BaseAdapter {
         // TODO Auto-generated method stub
         return 0;
     }
-    public View getView(int position, View view, ViewGroup parent) {
+    public View getView(final int position, View view, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.products_grid_view, null, true);
         ImageView imageView=(ImageView)row.findViewById(R.id.product_image);
 //        imageView.setImageResource(product_image.get(position));
         TextView textView=(TextView)row.findViewById(R.id.product_text);
-//        textView.setText(productObjList.get(position).getDescription());
+        textView.setText(productObjList.get(position).getDescription());
+        ImageButton button=(ImageButton) row.findViewById(R.id.edit_product);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,ProductDetails.class);
+                intent.putExtra("data",new Gson().toJson(productObjList.get(position)));
+                context.startActivity(intent);
+            }
+        });
         return row;
     }
 }

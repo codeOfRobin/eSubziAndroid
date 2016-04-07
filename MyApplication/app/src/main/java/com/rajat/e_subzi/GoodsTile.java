@@ -1,12 +1,11 @@
-package com.rajat.e_subzi.ui;
+package com.rajat.e_subzi;
 
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.rajat.e_subzi.Volley.VolleyClick;
-import com.rajat.e_subzi.R;
+
 /**
  * Created by Rishab on 02-03-2016.
  */
