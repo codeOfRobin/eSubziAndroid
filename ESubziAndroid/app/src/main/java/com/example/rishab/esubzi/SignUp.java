@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 
 public class SignUp extends ActionBarActivity implements AdapterView.OnItemSelectedListener{
-    private String[] dropDown={"Login as","Customer","Shopkeeper"};
+    private String[] dropDown={"Signup as","Customer","Shopkeeper"};
     HashMap<String,String> typeofuser=new HashMap<String,String>();
     Spinner spinner;
 

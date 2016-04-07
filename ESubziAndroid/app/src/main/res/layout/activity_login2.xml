@@ -33,14 +33,18 @@
         android:background="@drawable/roundness"
         android:layout_margin="20dp"
         android:hint="Username"
-        android:focusableInTouchMode="true" />
+        android:focusableInTouchMode="true"
+        android:paddingLeft="15dp" />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/roundness"
         android:layout_margin="20dp"
         android:hint="Password"
-        android:id="@+id/password" />
+        android:id="@+id/password"
+        android:paddingLeft="15dp"
+        android:inputType="numberPassword"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

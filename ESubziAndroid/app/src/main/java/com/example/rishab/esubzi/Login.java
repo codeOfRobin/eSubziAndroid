@@ -1,6 +1,7 @@
 package com.example.rishab.esubzi;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,6 +19,16 @@ public class Login extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
         getSupportActionBar().hide();
+        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        String tokens=pref.getString("token","no tokens");
+        if(!tokens.equals("no tokens")){
+            if(pref.getString("type","").equals("Shopkeeper")){
+                VolleyClick.findProductsClick(pref.getString("userId",""),this);
+            }
+            else{
+                VolleyClick.findDiscountsClick(pref.getString("userId",""),this);
+            }
+        }
 //        getActionBar().hide();
     }
 

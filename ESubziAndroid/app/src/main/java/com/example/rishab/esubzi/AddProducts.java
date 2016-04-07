@@ -293,8 +293,20 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         String name=(String)editText.getText().toString();
         editText=(EditText)findViewById(R.id.item_price);
         String price=(String)editText.getText().toString();
+        try{
+            int dum = Integer.parseInt(price);
+        }
+        catch (Exception e){
+            price="0";
+        }
         editText=(EditText)findViewById(R.id.item_discount);
         String discount=(String)editText.getText().toString();
+        try{
+            int dum = Integer.parseInt(discount);
+        }
+        catch (Exception e){
+            discount="0";
+        }
         Spinner spinner=(Spinner) findViewById(R.id.spinner1);
         String amount=spinner.getSelectedItem().toString();
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());

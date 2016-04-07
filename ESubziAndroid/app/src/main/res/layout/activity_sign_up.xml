@@ -40,7 +40,8 @@
         android:background="@drawable/roundness"
         android:layout_margin="20dp"
         android:hint="Password"
-        android:id="@+id/password" />
+        android:id="@+id/password"
+        android:inputType="numberPassword"/>
     <Spinner
         android:id="@+id/type"
         android:layout_width="181dp"
