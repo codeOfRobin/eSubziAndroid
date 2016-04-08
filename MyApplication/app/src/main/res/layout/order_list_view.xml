@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:translationZ="5dp"
+    android:padding="10dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delievered"
+        android:textSize="50dp"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#fff"
+        android:id="@+id/head" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/change_order_state1">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OrderReceived"
+            android:textSize="25dp"
+            android:layout_margin="10dp"
+            android:textColor="#fff"
+            android:id="@+id/three" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OrderBeingProcessed"
+            android:gravity="right|end"
+            android:textSize="20dp"
+            android:layout_margin="10dp"
+            android:layout_marginTop="20dp"
+            android:textColor="#fff"
+            android:id="@+id/four" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/change_order_state2">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delivering"
+            android:textSize="25dp"
+            android:layout_margin="10dp"
+            android:textColor="#fff"
+            android:id="@+id/one" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delivered"
+            android:textSize="25dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginTop="15dp"
+            android:textColor="#fff"
+            android:id="@+id/two" />
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="pehla"
+        android:textSize="25dp"
+        android:textColor="#fff"
+        android:id="@+id/order_ste" />
+</LinearLayout>
