@@ -90,7 +90,7 @@ public class VolleyClick {
     }
     public static void changeDiscountClick(String productId,int discount,Context context){
 //        CheckNetwork chkNet = new CheckNetwork(context);
-        String URL = "http://128.199.152.41:3000/api/change_discount";
+        String URL = "http://128.199.152.41:3000/api/changeDiscount";
 //        if (!chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.changeProductDiscountCall(URL, context, productId, discount, 3);

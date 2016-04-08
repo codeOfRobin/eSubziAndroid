@@ -25,6 +25,7 @@ public class SignUp extends ActionBarActivity implements AdapterView.OnItemSelec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        getSupportActionBar().hide();
         typeofuser.put("Customer", "1");
         typeofuser.put("Shopkeeper", "2");
         spinner=(Spinner) findViewById(R.id.type);
@@ -40,7 +41,7 @@ public class SignUp extends ActionBarActivity implements AdapterView.OnItemSelec
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_sign_up, menu);
+        //getMenuInflater().inflate(R.menu.menu_sign_up, menu);
         return true;
     }
 

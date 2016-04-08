@@ -251,6 +251,7 @@ public class JSONParser {
                 //resultJson.toJSONArray(products);
                  for (int i = 0; i < products.length(); i++) {
                     product = products.getJSONObject(i);
+                     price =product.getInt("price");
                     if(product.has("discount"))
                     discount = product.getInt("discount");
                     quantity = product.getInt("quantity");
@@ -422,6 +423,7 @@ public class JSONParser {
                 order = resultJson.getJSONObject("modifiedOrder");
                 orderId=order.getString("_id");
                 shopkeeperId = order.getString("shopKeeperId");
+                if(order.has("customerId"))
                 customerId = order.getString("customerId");
                 created_at = order.getString("created_at");
                 updated_at = order.getString("updated_at");
