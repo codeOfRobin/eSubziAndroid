@@ -112,7 +112,7 @@ public class VolleyClick {
     }
     public static void changeOrderStateClick(String orderId,String orderState,Context context){
 //        CheckNetwork chkNet = new CheckNetwork(context);
-        String URL = "http://128.199.152.41:3000/api/change_order_state";
+        String URL = "http://128.199.152.41:3000/api/changeorder_state";
 //        if (!chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.changeOrderStateCall(URL, context, orderId, orderState, 3);

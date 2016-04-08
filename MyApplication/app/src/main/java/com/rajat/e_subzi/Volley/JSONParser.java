@@ -176,7 +176,7 @@ public class JSONParser {
             }
             Log.i("rajat", discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message);
 //            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
-//            uploadFile("ImageUpload","http://192.168.43.69:3000/api/get_pic",file, "multipart",pprams,mlistener,err,listener,con);
+           // uploadFile("ImageUpload","http://128.199.152.41:3000/api/get_pic",file, "multipart",pprams,mlistener,err,listener,con);
             VolleyClick.findProductsClick(userId, con);
         } catch (Exception e) {
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
@@ -474,6 +474,7 @@ public class JSONParser {
                     order = orders.getJSONObject(x);
                     orderId= order.getString("_id");
                     shopkeeperId = order.getString("shopKeeperId");
+                    if(order.has("customerId"))
                     customerId = order.getString("customerId");
                     created_at = order.getString("created_at");
                     updated_at = order.getString("updated_at");
@@ -528,7 +529,7 @@ public class JSONParser {
                 message = resultJson.getString("message");
             }
             Log.i("rajat", token + " " + email + " " + deviceId + " " + deviceType + " " + message );
-            Tools.showAlertDialog(token + message, con);
+            Tools.showAlertDialog( message+token , con);
         } catch (Exception e) {
             e.printStackTrace();
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());

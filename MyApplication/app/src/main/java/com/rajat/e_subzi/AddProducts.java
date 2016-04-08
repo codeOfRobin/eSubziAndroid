@@ -302,7 +302,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
 
         //add the networking code here
     }
-    public void canncel(View view){
+    public void cancel(View view){
         this.finish();
     }
 }
