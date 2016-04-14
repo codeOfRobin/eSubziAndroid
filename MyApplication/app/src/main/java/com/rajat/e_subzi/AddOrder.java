@@ -1,5 +1,6 @@
 package com.rajat.e_subzi;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -31,6 +32,8 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
     ArrayList<Float> quantities;
     ListView mRecyclerView;
 
+    public static HashMap<String, Float> data_quantity=new HashMap<String,Float>();
+
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
@@ -49,7 +52,43 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
         Log.d("size",""+productObjList.size());
 
         mRecyclerView = (ListView) findViewById(R.id.order_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
+                Log.d("sheck", pref.getString("type", ""));
+                Log.d("check",""+position);
+                if(position==1){
+                    if (pref.getString("type","").equals("Shopkeeper")) {
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), AddOrder.this);
+                    } else {
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), AddOrder.this);
+                    }
+                }
+                else if(position==2){
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), AddOrder.this);
+                }
+                else if(position==3){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        AddOrder.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(AddOrder.this, Login.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        AddOrder.this.startActivity(intent);
+                    } else {
+                        VolleyClick.findPreferencesClick(pref.getString("userId",""), AddOrder.this);
+                    }
+                }
+                else if(position==4){
+                    AddOrder.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                    Intent intent = new Intent(AddOrder.this, Login.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    AddOrder.this.startActivity(intent);
+                }
+            }
+        });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
         list.add("Discounts/Products");
@@ -164,7 +203,7 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
         }
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         Log.d("rajar",Integer.toString(productIds.size()));
-        VolleyClick.placeOrderClick(pref.getString("userId"," "), productIds, quantities,this);
+        VolleyClick.placeOrderClick(pref.getString("userId"," "),pref.getString("email"," "),productObjList.get(0).getUserId(), productIds, quantities,this);
     }
     public void onItemSelected(AdapterView<?> parent, View view, int position,
                                long id) {

@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.rajat.e_subzi.Objects.OrderObject;
 import com.rajat.e_subzi.Objects.ProductObject;
@@ -31,9 +32,9 @@ public class Orders extends ActionBarActivity {
     String usertype="Customer";
     ArrayList<OrderObject> orderObjList;
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
-
+//    public static ArrayList<TextView> a;
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
-
+    public static TextView a;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +82,8 @@ public class Orders extends ActionBarActivity {
                     if (pref.getString("type", "").equals("Shopkeeper")) {
                         Orders.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                         Intent intent = new Intent(Orders.this, Login.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         Orders.this.startActivity(intent);
                     } else {
                         VolleyClick.findPreferencesClick(pref.getString("userId",""), Orders.this);
@@ -89,6 +92,8 @@ public class Orders extends ActionBarActivity {
                 else if(position==4){
                     Orders.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                     Intent intent = new Intent(Orders.this, Login.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     Orders.this.startActivity(intent);
                 }
             }

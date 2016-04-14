@@ -48,6 +48,10 @@ import java.util.Map;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
+import retrofit2.http.Multipart;
+import retrofit2.http.PUT;
+import retrofit2.http.Part;
+
 
 public class AddProducts extends ActionBarActivity implements AdapterView.OnItemSelectedListener {
     private String[] dropDown={"Quantity(in kgs):","1","2","3","4","5","6","7","8","9","10","11","12","13","14"};
@@ -57,7 +61,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-    private ImageView imgPreview;
+    private ImageView imgPreview ;
     private static final String IMAGE_DIRECTORY_NAME = "Products";
     private Uri fileUri;
     ListView mRecyclerView;
@@ -76,7 +80,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         actionBar = getSupportActionBar();
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
         actionBar.setBackgroundDrawable(colorDrawable);
-
+imgPreview =new ImageView(AddProducts.this);
         spinner=(Spinner)findViewById(R.id.spinner1);
         ArrayAdapter<String> adapter_state = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, dropDown);
@@ -86,7 +90,43 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         spinner.setOnItemSelectedListener(this);
 
         mRecyclerView = (ListView) findViewById(R.id.add_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
+                Log.d("sheck",pref.getString("type",""));
+                Log.d("check",""+position);
+                if(position==1){
+                    if (pref.getString("type","").equals("Shopkeeper")) {
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), AddProducts.this);
+                    } else {
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), AddProducts.this);
+                    }
+                }
+                else if(position==2){
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), AddProducts.this);
+                }
+                else if(position==3){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        AddProducts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(AddProducts.this, Login.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        AddProducts.this.startActivity(intent);
+                    } else {
+                        VolleyClick.findPreferencesClick(pref.getString("userId",""), AddProducts.this);
+                    }
+                }
+                else if(position==4){
+                    AddProducts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                    Intent intent = new Intent(AddProducts.this, Login.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    AddProducts.this.startActivity(intent);
+                }
+            }
+        });
 
         ArrayList<String> list=new ArrayList<String >();
         list.add("Discounts/Products");
@@ -177,8 +217,9 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
     }
     public void captureImage(View view){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        Uri fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        fileUri= Uri.parse("http://www.google.com");
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        System.out.println(fileUri);
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
@@ -192,7 +233,10 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
             if (resultCode == RESULT_OK) {
                 // successfully captured the image
                 // display it in image view
-                previewCapturedImage();
+
+//                fileUri=data.getData();
+//Log.d("rajatcam",""+fileUri);
+//                previewCapturedImage();
             } else if (resultCode == RESULT_CANCELED) {
                 // user cancelled Image capture
                 Toast.makeText(getApplicationContext(),
@@ -206,28 +250,27 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
             }
         }
     }
-    private void previewCapturedImage() {
-        try {
-            // hide video preview
-
-
-            imgPreview.setVisibility(View.VISIBLE);
-
-            // bimatp factory
-            BitmapFactory.Options options = new BitmapFactory.Options();
-
-            // downsizing image as it throws OutOfMemory Exception for larger
-            // images
-            options.inSampleSize = 8;
-
-            final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
-                    options);
-
-            imgPreview.setImageBitmap(bitmap);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void previewCapturedImage() {
+//        try {
+//            // hide video preview
+//
+//
+//            imgPreview.setVisibility(View.VISIBLE);
+//
+//            // bimatp factory
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//
+//            // downsizing image as it throws OutOfMemory Exception for larger
+//            // images
+//            options.inSampleSize = 8;
+//            final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
+//                    options);
+//
+//            imgPreview.setImageBitmap(bitmap);
+//        } catch (NullPointerException e) {
+//            e.printStackTrace();
+//        }
+//    }
     public Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
@@ -262,26 +305,28 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
             return null;
         }
         file=mediaFile;
+        if(file!=null){
+            Log.i("rajat","not null");
+        }
         return mediaFile;
     }
 
 
     public void addProduct(View view){
 
-        Map<String,String> params=new HashMap<String, String>();
-        params.put("ShopkeeperId",pref.getString("userId",""));
+
         Response.Listener<String> mListener=new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d("rishab","sdasda");
             }
         };
-        MultipartRequest.MultipartProgressListener listener=new MultipartRequest.MultipartProgressListener() {
-            @Override
-            public void transferred(long transfered, int progress) {
-                Log.d("rishab prog",""+transfered+"  "+progress);
-            }
-        };
+//        MultipartRequest.MultipartProgressListener listener=new MultipartRequest.MultipartProgressListener() {
+//            @Override
+//            public void transferred(long transfered, int progress) {
+//                Log.d("rishab prog",""+transfered+"  "+progress);
+//            }
+//        };
         Response.ErrorListener err=new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -298,8 +343,13 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         Spinner spinner=(Spinner) findViewById(R.id.spinner1);
         String amount=spinner.getSelectedItem().toString();
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId","0"), Integer.parseInt(discount),this,file,params,mListener,err,listener);
-
+        if(file!=null){
+            Log.i("rajat","not null2");
+        }
+        VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId","0"),pref.getString("email","0"), Integer.parseInt(discount),this,file,null,mListener,err,null);
+//        @Multipart
+//        @PUT("user/photo")
+//        Call<User> updateUser(@Part("photo") RequestBody photo, @Part("description") RequestBody description);
         //add the networking code here
     }
     public void cancel(View view){

@@ -7,10 +7,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rajat.e_subzi.Objects.ProductObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Rishab on 02-04-2016.
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 public class AddOrderAdapter extends BaseAdapter {
     ArrayList<ProductObject> discounts=new ArrayList<ProductObject>();
     Context context;
+
     public AddOrderAdapter(ArrayList<ProductObject> discounts,Context context){
         super();
         this.discounts=discounts;
@@ -45,9 +48,10 @@ public class AddOrderAdapter extends BaseAdapter {
         TextView data = (TextView) row.findViewById(R.id.commodity);
         data.setText(discounts.get(position).getDescription());
         data=(TextView)row.findViewById(R.id.price);
+        AddOrder.data_quantity.put(discounts.get(position).getProductId(),(float) discounts.get(position).getQuantity());
         data.setText("Price : "+Integer.toString(discounts.get(position).getPrice()));
         data=(TextView)row.findViewById(R.id.discount);
-        data.setText("Discount : "+Integer.toString(discounts.get(position).getDiscount()));
+        data.setText("Discount : " + Integer.toString(discounts.get(position).getDiscount()));
 
         Button button=(Button) row.findViewById(R.id.dec);
         button.setOnClickListener(new View.OnClickListener() {
@@ -68,8 +72,13 @@ public class AddOrderAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 TextView t=(TextView) row.findViewById(R.id.amt);
-                t.setText(Float.toString(Float.parseFloat((String) t.getText())+(float)0.5));
-                AddOrder.data.put(discounts.get(position).getProductId(), Float.parseFloat((String) t.getText()));
+                if (AddOrder.data_quantity.get(discounts.get(position).getProductId()) >= Float.parseFloat((String) t.getText())+(float)0.5){
+                    t.setText(Float.toString(Float.parseFloat((String) t.getText())+(float)0.5));
+                    AddOrder.data.put(discounts.get(position).getProductId(), Float.parseFloat((String) t.getText()));
+                }
+                else{
+                    Toast.makeText(context,"quantityt limit exceede",Toast.LENGTH_LONG).show();
+                }
             }
         });
         return row;

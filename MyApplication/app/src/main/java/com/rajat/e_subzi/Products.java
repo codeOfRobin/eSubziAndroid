@@ -123,6 +123,8 @@ public class Products extends ActionBarActivity{
                     if (pref.getString("type", "").equals("Shopkeeper")) {
                         Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                         Intent intent = new Intent(Products.this, Login.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         Products.this.startActivity(intent);
                     } else {
                         VolleyClick.findPreferencesClick(pref.getString("userId",""), Products.this);
@@ -131,6 +133,8 @@ public class Products extends ActionBarActivity{
                 else if(position==4){
                     Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                     Intent intent = new Intent(Products.this, Login.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     Products.this.startActivity(intent);
                 }
             }

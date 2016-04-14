@@ -33,5 +33,7 @@
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_add_order">AddOrder</string>
     <string name="title_activity_permission_form">PermissionForm</string>
+    <string name="title_activity_order_deatils">OrderDeatils</string>
+    <string name="title_activity_shops">Shops</string>
 
 </resources>

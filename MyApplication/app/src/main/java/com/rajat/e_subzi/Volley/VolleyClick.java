@@ -38,12 +38,12 @@ public class VolleyClick {
 //        }
     }
 
-    public static void createProductClick(int price ,int quantity, String description, String userId ,int discount,Context context, File file,Map<String,String> pprams,Response.Listener<String> mlistener, Response.ErrorListener err, MultipartRequest.MultipartProgressListener listener){
+    public static void createProductClick(int price ,int quantity, String description, String userId ,String userEmail,int discount,Context context, File file,Map<String,String> pprams,Response.Listener<String> mlistener, Response.ErrorListener err, MultipartRequest.MultipartProgressListener listener){
         CheckNetwork chkNet = new CheckNetwork(context);
         String URL = "http://128.199.152.41:3000/api/products/create";
 //        if (!chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
-            CallVolley.createProductCall(URL, context, price, quantity, description, userId, discount, 3, file, pprams, mlistener, err, listener);
+            CallVolley.createProductCall(URL, context, price, quantity, description, userId,userEmail, discount, 3, file, pprams, mlistener, err, listener);
 //        } else {
 //            Tools.showAlertDialog("Internet Available", context);
 //        }
@@ -52,7 +52,7 @@ public class VolleyClick {
         CheckNetwork chkNet = new CheckNetwork(context);
         String URL = "http://128.199.152.41:3000/api/products/find";
 //        if (!chkNet.checkNetwork()) {
-            VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
+            //VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.findProductsCall(URL, context, userId, 3);
 //        } else {
 //            Tools.showAlertDialog("Internet Available", context);
@@ -100,19 +100,19 @@ public class VolleyClick {
     }
 
     //placeOrderCall
-    public static void placeOrderClick(String customerId,ArrayList<String> productIds,ArrayList<Float> quantities,Context context){
+    public static void placeOrderClick(String customerId,String customerEmail,String shopkeeperId,ArrayList<String> productIds,ArrayList<Float> quantities,Context context){
 //        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = "http://128.199.152.41:3000/api/placeOrder";
 //        if (!chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
-            CallVolley.placeOrderCall(URL, context, customerId, productIds, quantities, 3);
+            CallVolley.placeOrderCall(URL, context, customerId,customerEmail,shopkeeperId, productIds, quantities, 3);
 //        } else {
 //            Tools.showAlertDialog("Internet Available", context);
 //        }
     }
     public static void changeOrderStateClick(String orderId,String orderState,Context context){
 //        CheckNetwork chkNet = new CheckNetwork(context);
-        String URL = "http://128.199.152.41:3000/api/changeorder_state";
+        String URL = "http://128.199.152.41:3000/api/changeOrderState";
 //        if (!chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.changeOrderStateCall(URL, context, orderId, orderState, 3);

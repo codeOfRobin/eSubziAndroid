@@ -44,6 +44,8 @@
         android:id="@+id/password"
         android:paddingLeft="15dp"
         android:inputType="textPassword" />
+
+
     <Spinner
         android:id="@+id/type"
         android:layout_width="181dp"

@@ -13,6 +13,7 @@ public class OrderObject {
     String shopkeeperId = "";
     String currentState = "";
     String customerId = "";
+    String customerEmail ="";
     String orderId = "";
     String created_at = "";
     String updated_at = "";
@@ -21,12 +22,12 @@ public class OrderObject {
     //int quantity = 0;
 
 
-    public OrderObject(String shopkeeperId, String currentState, String customerId, String orderId, String created_at, String updated_at, ArrayList<ItemObject> itemObjArr) {
+    public OrderObject(String shopkeeperId, String currentState, String customerId, String customerEmail, String orderId, String created_at, String updated_at, ArrayList<ItemObject> itemObjArr) {
         this.shopkeeperId = shopkeeperId;
         this.currentState = currentState;
         this.customerId = customerId;
+        this.customerEmail = customerEmail;
         this.orderId = orderId;
-
         this.created_at = created_at;
         this.updated_at = updated_at;
         this.itemObjArr = itemObjArr;
@@ -54,6 +55,14 @@ public class OrderObject {
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
     }
 
     public String getOrderId() {

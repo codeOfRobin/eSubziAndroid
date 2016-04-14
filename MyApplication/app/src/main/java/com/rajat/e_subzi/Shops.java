@@ -6,101 +6,47 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.rajat.e_subzi.Objects.ProductObject;
-import com.rajat.e_subzi.Volley.VolleyClick;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rajat.e_subzi.Objects.ProductObject;
+import com.rajat.e_subzi.Volley.VolleyClick;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 
-public class ProductDetails extends ActionBarActivity {
-    ProductObject product;
+public class Shops extends ActionBarActivity {
     ListView mRecyclerView;
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;
+    public static HashMap<String , ArrayList<ProductObject>> shop_discount_details=new HashMap<String,ArrayList<ProductObject>>();
+    ArrayList<String> shops=new ArrayList<String >();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_details);
-        Intent intent=getIntent();
-        product=(ProductObject) new Gson().fromJson((String) intent.getStringExtra("data"), ProductObject.class);
-        EditText edittext=(EditText)findViewById(R.id.p_desc);
-        edittext.setText(product.getDescription());
-        edittext=(EditText)findViewById(R.id.p_discount);
-        edittext.setText(Integer.toString(product.getDiscount()));
+        setContentView(R.layout.activity_shops);
+        shop_discount_details=(HashMap<String,ArrayList<ProductObject>>) new Gson().fromJson(getIntent().getStringExtra("data"),new TypeToken<HashMap<String ,ArrayList<ProductObject>>>() {
+        }.getType());
+        Set<String> keys=shop_discount_details.keySet();
+        for(String key: keys){
+            shops.add(key);
+        }
 
-        edittext.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        ShopsAdapter adapter=new ShopsAdapter(shops,this);
+        ListView listView=(ListView)findViewById(R.id.shopkeeper_lists);
+        listView.setAdapter(adapter);
 
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                EditText editText = (EditText) findViewById(R.id.p_discount);
-                String discount = editText.getText().toString();
-                editText = (EditText) findViewById(R.id.p_discount);
-                discount = editText.getText().toString();
-
-                try{
-                    int we=Integer.parseInt(discount);
-                    VolleyClick.changeDiscountClick(product.getProductId(), Integer.parseInt(discount), ProductDetails.this);
-                }
-                catch (Exception e){
-                    Toast.makeText(ProductDetails.this, "Please enter valid price",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        edittext=(EditText)findViewById(R.id.p_price);
-        edittext.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                EditText editText=(EditText)findViewById(R.id.p_price);
-                try{
-                    int we=Integer.parseInt(editText.getText().toString());
-                    VolleyClick.updatePriceClick(product.getProductId(), Integer.parseInt(editText.getText().toString()),ProductDetails.this);
-                }
-                catch (Exception e){
-                    Toast.makeText(ProductDetails.this, "Please enter valid price",
-                            Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-        edittext.setText(Integer.toString(product.getPrice()));
-        edittext=(EditText)findViewById(R.id.p_quantity);
-        edittext.setText(Integer.toString(product.getQuantity()));
-        mRecyclerView = (ListView) findViewById(R.id.product_details_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView = (ListView) findViewById(R.id.shops_nav); // Assigning the RecyclerView Object to the xml View
         mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -110,31 +56,31 @@ public class ProductDetails extends ActionBarActivity {
                 Log.d("check",""+position);
                 if(position==1){
                     if (pref.getString("type","").equals("Shopkeeper")) {
-                        VolleyClick.findProductsClick(pref.getString("userId", ""), ProductDetails.this);
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), Shops.this);
                     } else {
-                        VolleyClick.findDiscountsClick(pref.getString("userId",""), ProductDetails.this);
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Shops.this);
                     }
                 }
                 else if(position==2){
-                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), ProductDetails.this);
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Shops.this);
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        ProductDetails.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(ProductDetails.this, Login.class);
+                        Shops.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(Shops.this, Login.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        ProductDetails.this.startActivity(intent);
+                        Shops.this.startActivity(intent);
                     } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), ProductDetails.this);
+                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Shops.this);
                     }
                 }
                 else if(position==4){
-                    ProductDetails.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(ProductDetails.this, Login.class);
+                    Shops.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                    Intent intent = new Intent(Shops.this, Login.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    ProductDetails.this.startActivity(intent);
+                    Shops.this.startActivity(intent);
                 }
             }
         });
@@ -189,13 +135,12 @@ public class ProductDetails extends ActionBarActivity {
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_product_details, menu);
+        getMenuInflater().inflate(R.menu.menu_shops, menu);
         return true;
     }
 
@@ -212,9 +157,5 @@ public class ProductDetails extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-    public void done(View view){
-        this.finish();
-        VolleyClick.findProductsClick(getSharedPreferences("MyPrefs",MODE_PRIVATE).getString("userId",""), this);
     }
 }

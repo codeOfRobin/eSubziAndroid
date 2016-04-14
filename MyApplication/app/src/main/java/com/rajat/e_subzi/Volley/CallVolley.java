@@ -9,6 +9,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import com.google.gson.Gson;
@@ -17,6 +18,8 @@ import com.rajat.e_subzi.LoginActivity;
 import com.rajat.e_subzi.Tools.MultipartRequest;
 import com.rajat.e_subzi.Tools.Tools;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +39,10 @@ public class CallVolley {
                 Log.i("rajat", "setCustomRetryPolicy");
                 jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         }
-
+        private static void setCustomRetryPolicy(JsonObjectRequest jsonObjReq) {
+                Log.i("rajat", "setCustomRetryPolicy");
+                jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        }
         public static void signUpCall(String url, final Context context, final String email,final String password,final String type,final int Number)
         {
                 pDialog=  Tools.showProgressBar(context);
@@ -50,9 +56,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.SignUpApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -102,10 +109,11 @@ public class CallVolley {
                         {
                                 try
                                 {
+                                        pDialog.dismiss();
                                         Log.i("rajat", " onResponseActive " + response);
                                         JSONParser.LoginApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -142,7 +150,7 @@ public class CallVolley {
                 //get instance of volleysingleton and add reuest to the queue
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
-        public static void createProductCall(String url, final Context context,final int price ,final int quantity,final String description,final String userId ,final int discount,final int Number,final File file, final Map<String,String> pprams,
+        public static void createProductCall(String url, final Context context,final int price ,final int quantity,final String description,final String userId ,final String userEmail,final int discount,final int Number,final File file, final Map<String,String> pprams,
                                              final Response.Listener<String> mlistener,final Response.ErrorListener err, final MultipartRequest.MultipartProgressListener listener)
         {
 
@@ -156,10 +164,11 @@ public class CallVolley {
                         {
                                 try
                                 {
+                                        pDialog.dismiss();
                                         Log.i("rajat", " onResponseActive " + response);
                                         JSONParser.CreateProductApiJsonParser(response, context, file, pprams, mlistener, err, listener);
 //                                        JSONParser.FindProductsApiJsonParser(response, context);
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -196,7 +205,9 @@ public class CallVolley {
                                 params.put("quantity",quantity+"");
                                 params.put("description",description);
                                 params.put("userId",userId);
+                                params.put("userEmail",userEmail);
                                 params.put("discount",""+discount);
+
                                 return params;
                         }
                 };
@@ -220,9 +231,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.FindProductsApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -238,6 +250,7 @@ public class CallVolley {
                         public void onErrorResponse(VolleyError error)
                         {
                                 Log.i("rajat", "onErrorResponse" + error.toString());
+                                error.printStackTrace();
                                 pDialog.dismiss();
                         }
                 }){
@@ -269,7 +282,7 @@ public class CallVolley {
 
         public static void findDiscountsCall(String url, final Context context,final String userId,final int Number)
         {
-//                pDialog=  Tools.showProgressBar(context);
+                pDialog=  Tools.showProgressBar(context);
 
                 StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>()
                 {
@@ -280,9 +293,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat_  ", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.FindDiscountsApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -389,10 +403,11 @@ public class CallVolley {
                         {
                                 try
                                 {
+                                        pDialog.dismiss();
                                         Log.i("rajat", " onResponseActive " + response);
                                         JSONParser.UpdateProductPriceApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -449,10 +464,11 @@ public class CallVolley {
                         {
                                 try
                                 {
+                                        pDialog.dismiss();
                                         Log.i("rajat", " onResponseActive " + response);
                                         JSONParser.ChangeProductDiscountApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -485,8 +501,8 @@ public class CallVolley {
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
                                 Map<String, String> params = new HashMap<>();
-                                params.put("id",productId);
-                                params.put("discount",discount+"");
+                                params.put("id", productId);
+                                params.put("discount", discount + "");
                                 return params;
                         }
                 };
@@ -497,37 +513,38 @@ public class CallVolley {
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
 
-        public static void placeOrderCall(String url, final Context context,final String customerId,final ArrayList<String> productIds,final ArrayList<Float> quantities,final int Number)
+        public static void placeOrderCall(String url, final Context context,final String customerId,final String customerEmail,final String shopkeeperId,final ArrayList<String> productIds,final ArrayList<Float> quantities,final int Number)
         {
                 pDialog=  Tools.showProgressBar(context);
 
-                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
-                {
-                        // if a reponse is recieved after sending request
-                        @Override
-                        public void onResponse(String response)
-                        {
-                                try
-                                {
+                JSONObject post= new JSONObject();
+                try{
+                        JSONObject postItem = new JSONObject();
+                        for(int x=0;x<productIds.size();x++){
+                                postItem.put(productIds.get(x), quantities.get(x));
+                        }
+                        post.put("customerId", customerId);
+                        post.put("customerEmail",customerEmail);
+                        post.put("shopKeeperId", shopkeeperId);
+                        post.put("items",postItem);
+
+                }catch (JSONException je){
+                        je.printStackTrace();
+                }
+                JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, post,
+                        new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
                                         Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.PlaceOrderApiJsonParser(response, context);
 
                                         pDialog.dismiss();
+                                        JSONParser.PlaceOrderApiJsonParser(response, context);
+
                                 }
-                                catch (Exception localException)
-                                {
-                                        Log.i("rajat"," onResponseException "+localException.getMessage());
-                                        localException.printStackTrace();
-                                }
-                        }
-                }
-                        , new Response.ErrorListener()
-                {
-                        //if error occurs
+                        }, new Response.ErrorListener() {
                         @Override
-                        public void onErrorResponse(VolleyError error)
-                        {
-                                Log.i("rajat", "onErrorResponse" + error.toString());
+                        public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
                                 pDialog.dismiss();
                         }
                 }){
@@ -537,31 +554,6 @@ public class CallVolley {
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
                                 mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
-                        }
-                        @Override
-                        public String getBodyContentType() {
-                                return "application/x-www-form-urlencoded; charset=UTF-8";
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                                Map<String, String> params = new HashMap<>();
-                                JSONArray productIdsArr=new JSONArray();
-                                JSONArray quantitiesArr= new JSONArray();
-                                for(int x=0;x<productIds.size();x++){
-                                        productIdsArr.put(productIds.get(x));
-                                        quantitiesArr.put(quantities.get(x)+"");
-                                }
-                                String[] prods=new String[productIds.size()];
-                                        productIds.toArray(prods);
-                                Float[] quans=new Float[quantities.size()];
-                                quantities.toArray(quans);
-                               // JSONObject pro = new JSONObject(prods);
-                                JSONArray pro = new JSONArray(productIds);
-                                JSONArray quo =new JSONArray(quantities);
-                                params.put("customerId",customerId);
-                                params.put("productIds",pro.toString());
-                                params.put("quantityVals",quo.toString());
-                                return params;
                         }
                 };
 
@@ -584,9 +576,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.ChangeOrderStateApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -646,9 +639,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.FindOrdersApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {

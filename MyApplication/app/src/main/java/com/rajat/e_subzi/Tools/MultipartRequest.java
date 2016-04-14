@@ -61,7 +61,7 @@ public class MultipartRequest extends Request<String> {
         }
         entity.setBoundary(boundary);
         buildMultipartEntity();
-//        httpentity = entity.build();
+        httpentity = entity.build();
     }
 
     // public void addStringBody(String param, String value) {

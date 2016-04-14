@@ -126,6 +126,8 @@ public static Context context;
                     if (pref.getString("type", "").equals("Shopkeeper")) {
                         Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                         Intent intent = new Intent(Discounts.this, Login.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         Discounts.this.startActivity(intent);
                     } else {
                         VolleyClick.findPreferencesClick(pref.getString("userId",""), Discounts.this);
@@ -134,6 +136,8 @@ public static Context context;
                 else if(position==4){
                     Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                     Intent intent = new Intent(Discounts.this, Login.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     Discounts.this.startActivity(intent);
                 }
             }

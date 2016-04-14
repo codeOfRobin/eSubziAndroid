@@ -44,7 +44,6 @@ public class PermissionForm extends ActionBarActivity implements AdapterView.OnI
         test.add(d);
         test.add(d);
 
-
         ListView listView=(ListView) findViewById(R.id.shopkeeper_list);
         PermissionsAdapter adapter=new PermissionsAdapter(test,this);
         listView.setAdapter(adapter);

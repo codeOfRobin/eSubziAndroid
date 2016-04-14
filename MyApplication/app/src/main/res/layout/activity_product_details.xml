@@ -96,16 +96,7 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/add_nav"
-        android:layout_width="320dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
 
-        android:background="#ffffff"
-        android:scrollbars="vertical">
-
-    </ListView>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -133,6 +124,15 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"></LinearLayout>
     </RelativeLayout>
+    <ListView
+        android:id="@+id/product_details_nav"
+        android:layout_width="320dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
 
+        android:background="#ffffff"
+        android:scrollbars="vertical">
+
+    </ListView>
 
 </android.support.v4.widget.DrawerLayout>
