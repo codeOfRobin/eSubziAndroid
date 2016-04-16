@@ -121,6 +121,10 @@
             android:name=".Shops"
             android:label="@string/title_activity_shops" >
         </activity>
+        <activity
+            android:name=".CreateDiscount"
+            android:label="@string/title_activity_create_discounts" >
+        </activity>
     </application>
 
 </manifest>

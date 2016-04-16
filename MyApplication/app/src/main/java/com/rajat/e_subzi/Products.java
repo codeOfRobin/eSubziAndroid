@@ -48,6 +48,7 @@ public class Products extends ActionBarActivity{
     String productId = "";
     String message = "";
     ArrayList<ProductObject> productObjects;
+    ArrayList<String> photoUrls;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +58,9 @@ public class Products extends ActionBarActivity{
         Intent intent=getIntent();
         productObjects=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
                 new TypeToken<ArrayList<ProductObject>>() {
+                }.getType());
+        photoUrls = (ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("photoUrl"),
+                new TypeToken<ArrayList<String>>() {
                 }.getType());
 
 //        try {
@@ -84,7 +88,7 @@ public class Products extends ActionBarActivity{
 //        }
         gridView=(GridView) findViewById(R.id.product_grid);
 
-        productsGridAdapter=new ProductsGridAdapter(this,count,productObjects);
+        productsGridAdapter=new ProductsGridAdapter(this,count,productObjects,photoUrls);
         gridView.setAdapter(productsGridAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -121,29 +125,37 @@ public class Products extends ActionBarActivity{
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
+                        Intent intent = new Intent(Products.this, CreateDiscount.class);
+                        Products.this.startActivity(intent);
+                    } else {
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), Products.this);
+                    }
+                }
+                else if(position==4){
+
+                    if(pref.getString("type", "").equals("Shopkeeper"))
+                    {
                         Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                         Intent intent = new Intent(Products.this, Login.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         Products.this.startActivity(intent);
-                    } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Products.this);
+                    }else{
+                        VolleyClick.logoutClick(pref.getString("deviceId",""),Products.this);
                     }
-                }
-                else if(position==4){
-                    Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(Products.this, Login.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    Products.this.startActivity(intent);
                 }
             }
         });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Products");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
         list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
             list.add("Log Out");
         }
         else{

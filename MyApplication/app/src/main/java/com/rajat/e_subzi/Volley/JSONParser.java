@@ -5,29 +5,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
-import com.rajat.e_subzi.AddProducts;
 import com.rajat.e_subzi.Discounts;
-import com.rajat.e_subzi.LoginActivity;
 import com.rajat.e_subzi.Objects.ItemObject;
 import com.rajat.e_subzi.Objects.OrderObject;
 import com.rajat.e_subzi.Objects.ProductObject;
+import com.rajat.e_subzi.Objects.ShopObject;
 import com.rajat.e_subzi.Orders;
+import com.rajat.e_subzi.PermissionForm;
 import com.rajat.e_subzi.Products;
-import com.rajat.e_subzi.R;
 import com.rajat.e_subzi.Shops;
-import com.rajat.e_subzi.Tools.MultipartRequest;
-import com.rajat.e_subzi.Tools.MultipartyRequest;
 import com.rajat.e_subzi.Tools.Tools;
 import com.google.gson.Gson;
 
@@ -163,7 +159,7 @@ public class JSONParser {
     }
 
     //
-    public static void CreateProductApiJsonParser(String JsonStringResult, Context con, File file,Map<String,String> pprams,Response.Listener<String> mlistener, Response.ErrorListener err, MultipartRequest.MultipartProgressListener listener) {
+    public static void CreateProductApiJsonParser(String JsonStringResult,final Context con,final File file,Map<String,String> pprams,Response.Listener<String> mlistener, Response.ErrorListener err) {
         try {
 
             JSONObject product;
@@ -198,15 +194,26 @@ public class JSONParser {
             Log.i("rajat", discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message);
 //            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
             //uploadFile("ImageUpload", "http://192.168.43.200:3000/api/profile", file, "multipart", pprams, mlistener, err, listener, con);
-           // uploadImage(con);
-            VolleyClick.findProductsClick(userId, con);
+
+            uploadImage(con,file,productId,userId);
+
+//            byte[] multipartBody = getFileDataFromDrawable(con, R.mipmap.ic_launcher);
+//            FileOutputStream fos = new FileOutputStream(file.getPath());
+//            fos.write(multipartBody);
+//            fos.close();
+//            File f= new File(file.getPath());
+//            new UploadImage(f,con).execute();
+
+//           VolleyClick.findProductsClick(userId, con);
         } catch (Exception e) {
+            e.printStackTrace();
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
         }
     }
 
     public static void FindProductsApiJsonParser(String JsonStringResult, Context con) {
         try {
+
             JSONArray products;
             JSONObject product;
             String created_at = "";
@@ -219,6 +226,7 @@ public class JSONParser {
             int price = 0;
             String productId = "";
             String message = "";
+            ArrayList<String> photoUrl= new ArrayList<String>();
             //create json object from response string
             ArrayList<ProductObject> productObjList = new ArrayList<ProductObject>();
             JSONObject resultJson = new JSONObject(JsonStringResult);
@@ -232,6 +240,9 @@ public class JSONParser {
                     price = product.getInt("price");}
                     if(product.has("userEmail")){
                         userEmail = product.getString("userEmail");
+                    }
+                    if(product.has("photoUrl")){
+                        photoUrl.add(product.getString("photoUrl"));
                     }
                     userId = product.getString("userId");
                     description = product.getString("description");
@@ -247,6 +258,7 @@ public class JSONParser {
             Intent intent=new Intent(con,Products.class);
 
             intent.putExtra("data", (String) new Gson().toJson(productObjList));
+            intent.putExtra("photoUrl",(String) new Gson().toJson(photoUrl));
             con.startActivity(intent);
         } catch (Exception e) {
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
@@ -269,6 +281,9 @@ public class JSONParser {
             int price = 0;
             String productId = "";
             String message = "";
+            String photoUrl="";
+            ArrayList<String> photoUrls = new ArrayList<String>();
+            HashMap<String,ArrayList<String>> photos=new HashMap<String ,ArrayList<String>>();
             //create json object from response string
             productObjList = new ArrayList<ProductObject>();
             //JSONObject resultJson = new JSONObject(JsonStringResult);
@@ -292,14 +307,21 @@ public class JSONParser {
                     created_at = product.getString("created_at");
                     if(product.has("updated_at"))
                     updated_at = product.getString("updated_at");
+                    if(product.has("photoUrl")){
+                        photoUrl=product.getString("photoUrl");
+                        photoUrls.add(product.getString("photoUrl"));
+                    }
 
 
                     if(shops.containsKey(userEmail)){
                         shops.get(userEmail).add(new ProductObject(created_at, updated_at, userId, discount, description, quantity, price, productId, userEmail));
+                        photos.get(userEmail).add(photoUrl);
                     }
                      else {
                         shops.put(userEmail,new ArrayList<ProductObject>());
                         shops.get(userEmail).add(new ProductObject(created_at, updated_at, userId, discount, description, quantity, price, productId, userEmail));
+                        photos.put(userEmail,new ArrayList<String>());
+                        photos.get(userEmail).add(photoUrl);
                     }
 
 
@@ -310,8 +332,10 @@ public class JSONParser {
 //            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
             Log.d("check",new Gson().toJson(shops));
             Intent intent=new Intent(con,Shops.class);
-            Log.d("check",new Gson().toJson(shops));
+            Log.d("check", new Gson().toJson(shops));
             intent.putExtra("data", new Gson().toJson(shops));
+            Log.i("rajat", new Gson().toJson(photos)+"sixe" + photoUrls.size());
+            intent.putExtra("photoUrl", new Gson().toJson(photos));
             con.startActivity(intent);
         } catch (Exception e) {
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
@@ -575,9 +599,15 @@ public class JSONParser {
             //String productId = "";
             int orderQuantity = 0;
             String message = "";
+            String phoneNumber= "";
+            String address="";
+            JSONArray numbers=new JSONArray();
+            JSONArray addresses=new JSONArray();
             ItemObject itemObj;
             //
             ArrayList<ItemObject> itemObjList = new ArrayList<ItemObject>();
+            ArrayList<String> Addressess= new ArrayList<String>();
+            ArrayList<String> Numbers= new ArrayList<String>();
             //create json object from response string
             JSONObject resultJson = new JSONObject(JsonStringResult);
             if (resultJson.has("Orders")) {
@@ -595,7 +625,9 @@ public class JSONParser {
                     currentState = order.getString("currentState");
                     //Log.i("rajat",resultJson.get("items").getClass()+" "+resultJson.get(""));
                     items = order.getJSONArray("items");
+                    itemObjList = new ArrayList<ItemObject>();
                     for (int i = 0; i < items.length(); i++) {
+
                         item = items.getJSONObject(i);
                         if(item.has("_id"))
                         itemId = item.getString("_id");
@@ -624,10 +656,33 @@ public class JSONParser {
 
                 message = resultJson.getString("message");
             }
+            if(resultJson.has("UserNumber")){
+                numbers=resultJson.getJSONArray("UserNumber");
+                for (int i=0; i<numbers.length();i++){
+                    phoneNumber = numbers.getString(i);
+                    Numbers.add(phoneNumber);
+                    Log.i("rajat", phoneNumber );
+                }
+                //phoneNumber = resultJson.getString("UserNumber");
+            }
+            if(resultJson.has("UserAddress")){
+                addresses = resultJson.getJSONArray("UserAddress");
+                //String[] addres = new String[resultJson.ge];
+                for (int i=0; i<addresses.length();i++){
+                    address = addresses.getString(i);
+                    Addressess.add(address);
+                    Log.i("rajat", address);
+                }
+
+
+               // address = resultJson.getString("UserAddress");
+            }
             Log.i("rajat", shopkeeperId + " " + customerId + " " + orderObjList.size() + " " + productId + " " + message);
 //            Tools.showAlertDialog(shopkeeperId + " " + customerId + " " + orderObjList.size() + " " + productId + " " + message, con);
             Intent intent=new Intent(con, Orders.class);
             intent.putExtra("data",new Gson().toJson(orderObjList));
+           intent.putExtra("userPhone",new Gson().toJson(Numbers));
+           intent.putExtra("userAddress",new Gson().toJson(Addressess));
             con.startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();
@@ -642,7 +697,8 @@ public class JSONParser {
             String deviceType="";
             String email="";
             String  deviceId="";
-
+            ArrayList<String> subscriptions=new ArrayList<String>();
+            JSONArray subscriptionArr = new JSONArray();
             String message = "";
             //create json object from response string
             JSONObject resultJson = new JSONObject(JsonStringResult);
@@ -652,52 +708,92 @@ public class JSONParser {
                 email= device.getString("email");
                 deviceId = device.getString("_id");
                 deviceType = device.getString("deviceType");
-
+                if(device.has("subscribedIDs")){
+                    //subscriptions;
+                    subscriptionArr = device.getJSONArray("subscribedIDs");
+                    for(int i =0 ;i<subscriptionArr.length();i++){
+                        subscriptions.add(subscriptionArr.getString(i));
+                    }
+                }
+                SharedPreferences shares= con.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = shares.edit();
+                editor.putString("deviceId", deviceId);
+                editor.commit();
             }
             if(resultJson.has("message")){
                 message = resultJson.getString("message");
             }
-            Log.i("rajat", token + " " + email + " " + deviceId + " " + deviceType + " " + message );
-            Tools.showAlertDialog( message+token , con);
+            Log.i("rajat", message + token + " " + email + " " + deviceId + " " + deviceType + " ");
+            //Tools.showAlertDialog(message + token, con);
         } catch (Exception e) {
             e.printStackTrace();
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
         }
     }
-    public static  <T> void uploadFile(final String tag, final String url,
-                                  final File file, final String partName,
-                                  final Map<String, String> headerParams,
-                                  final Response.Listener<String> resultDelivery,
-                                  final Response.ErrorListener errorListener,
-                                  MultipartRequest.MultipartProgressListener progListener,final Context context) {
 
+    public static void SetSubscriptionApiJsonParser(String JsonStringResult, Context con){
+        try {
 
-        MultipartRequest mr = new MultipartRequest(url, errorListener,
-                resultDelivery, file, file.length(), null, headerParams,
-                partName, progListener){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                //Log.i("size in getHeader: ",myHeaders.size()+"");
-                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
-                return mHeaders;
+            JSONObject device;
+            String token="";
+            String deviceType="";
+            String email="";
+            String  deviceId="";
+            ArrayList<String> subscriptions=new ArrayList<String>();
+            JSONArray subscriptionArr = new JSONArray();
+            String message = "";
+            //create json object from response string
+            JSONObject resultJson = new JSONObject(JsonStringResult);
+            if (resultJson.has("updatedDevice")) {
+                device = resultJson.getJSONObject("updatedDevice");
+                token = device.getString("token");
+                email= device.getString("email");
+                deviceId = device.getString("_id");
+                deviceType = device.getString("deviceType");
+                if(device.has("subscribedIDs")){
+                    //subscriptions;
+                    subscriptionArr = device.getJSONArray("subscribedIDs");
+                    for(int i =0 ;i<subscriptionArr.length();i++){
+                        subscriptions.add(subscriptionArr.getString(i));
+                    }
+                }
+
             }
-        };
-
-        Log.d("mp","working");
-        mr.setTag(tag);
-        VolleySingleton.getInstance(context).addToRequestQueue(mr);
-//        Volley.newRequestQueue(this).add(mr);
-
+            if(resultJson.has("message")){
+                message = resultJson.getString("message");
+            }
+            Log.i("rajat", token + " " + email + " " + deviceId + " " + deviceType + " " + message);
+            //Tools.showAlertDialog( message+token , con);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
+        }
     }
+
     private static final String twoHyphens = "--";
     private static final String lineEnd = "\r\n";
     private static final String boundary = "apiclient-" + System.currentTimeMillis();
     private static final String mimeType = "multipart/form-data;boundary=" + boundary;
     private static byte[] multipartBody;
-    public static void uploadImage(final Context context){
-        byte[] fileData1 = getFileDataFromDrawable(context, R.mipmap.ic_launcher);
-        byte[] fileData2 = getFileDataFromDrawable(context, R.mipmap.ic_launcher);
+    public static void uploadImage(final Context context,File file,String productId,final String userId){
+
+        byte[] fileData1;//=getFileDataFromDrawable(context, R.mipmap.ic_launcher); ;
+        String filePath = file.getPath();
+        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+        Bitmap bit2 = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bit2.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
+
+        fileData1 = byteArrayOutputStream.toByteArray();
+        //ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        try {
+//            //FileUtils.readFileToByteArray(file);
+//        } catch (IOException e) {
+//            fileData1 = getFileDataFromDrawable(context, R.mipmap.ic_launcher);
+//            e.printStackTrace();
+//        }
+        //fileData1 = file.
+        //byte[] fileData2 = getFileDataFromDrawable(context, R.mipmap.ic_launcher);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);
@@ -705,37 +801,36 @@ public class JSONParser {
             // the first file
             buildPart(dos, fileData1, "ic_action_android.png");
             // the second file
-            buildPart(dos, fileData2, "ic_action_book.png");
+            //buildPart(dos, fileData2, "ic_action_book.png");
             // send multipart form data necesssary after file data
+            buildTextPart(dos,"productId", productId);
             dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
             // pass to multipart body
-            multipartBody=bos.toByteArray();
+            multipartBody = bos.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //multipartBody = getFileDataFromDrawable(context, R.mipmap.ic_launcher);
-        Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-        mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
-Log.i("rajat","lenMul"+multipartBody.length+"");
-        String url = "http://192.168.43.200:3000/api/profile";
-        MultipartyRequest multipartRequest = new MultipartyRequest(url, mHeaders, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
+
+        String url = "http://128.199.152.41:3000/api/profile";
+        MultipartRequest multipartRequest = new MultipartRequest(url, null, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
             @Override
             public void onResponse(NetworkResponse response) {
                 Toast.makeText(context, "Upload successfully!", Toast.LENGTH_SHORT).show();
+                VolleyClick.findProductsClick(userId, context);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
                 Toast.makeText(context, "Upload failed!\r\n" + error.toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        VolleySingleton.getInstance(context).getRequestQueue().add(multipartRequest);
+        VolleySingleton.getInstance(context).addToRequestQueue(multipartRequest);
     }
     private static void buildPart(DataOutputStream dataOutputStream, byte[] fileData, String fileName) throws IOException {
         dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
-        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\"; filename=\""
+        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"image\"; filename=\""
                 + fileName + "\"" + lineEnd);
         dataOutputStream.writeBytes(lineEnd);
 
@@ -758,11 +853,100 @@ Log.i("rajat","lenMul"+multipartBody.length+"");
 
         dataOutputStream.writeBytes(lineEnd);
     }
+
     private static byte[] getFileDataFromDrawable(Context context, int id) {
         Drawable drawable = ContextCompat.getDrawable(context, id);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
+    }
+    private static void buildTextPart(DataOutputStream dataOutputStream, String parameterName, String parameterValue) throws IOException {
+        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
+        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"" + parameterName + "\"" + lineEnd);
+        dataOutputStream.writeBytes("Content-Type: text/plain; charset=UTF-8" + lineEnd);
+        dataOutputStream.writeBytes(lineEnd);
+        dataOutputStream.writeBytes(parameterValue + lineEnd);
+    }
+
+
+
+    public static void setSubcriptionsApiJsonParser(JSONObject JsonStringResult, Context con) {
+        try {
+            //boolean status;
+            String email = "";
+            String userId = "";
+            String error = "";
+            String token = "";
+            String type = "";
+            //create json object from response string
+            JSONObject resultJson = JsonStringResult;
+            if(resultJson.has("message")){
+                Toast.makeText(con, resultJson.getString("message"),
+                        Toast.LENGTH_LONG).show();
+//                return;
+            }
+
+
+            VolleyClick.findDiscountsClick(userId,con);
+
+
+        } catch (Exception e) {
+            Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
+        }
+    }
+
+    public static void getSubcriptionsApiJsonParser(String JsonStringResult, Context con) {
+        try {
+            //boolean status;
+            String email = "";
+            String userId = "";
+            String error = "";
+            String token = "";
+            String type = "";
+            JSONArray userObj= new JSONArray();
+            JSONObject userObject = new JSONObject();
+            ArrayList<String> subscription_list = new ArrayList<String>();
+            JSONArray subscrip_array = new JSONArray();
+            ArrayList<ShopObject> shops = new ArrayList<ShopObject>();
+            //create json object from response string
+            JSONObject resultJson = new JSONObject(JsonStringResult);
+            if(resultJson.has("message")){
+                if(resultJson.getString("message").equals("not found")){
+                    Toast.makeText(con, "Invalid "+resultJson.getString("message"),
+                            Toast.LENGTH_LONG).show();
+
+                }else if(resultJson.getString("message").equals("found")){
+                    if(resultJson.has("Users")){
+                        userObj=resultJson.getJSONArray("Users");
+                        for(int i=0;i<userObj.length();i++){
+                            userObject = userObj.getJSONObject(i);
+                            email = userObject.getString("email");
+                            userId=userObject.getString("_id");
+                            shops.add(new ShopObject(userId,email));
+                        }
+
+                    }
+                    if(resultJson.has("SubscribedIds")){
+//                        userObj=resultJson.getJSONObject("Users")
+                        subscrip_array=resultJson.getJSONArray("SubscribedIds");
+                        for(int j=0 ; j<subscrip_array.length();j++){
+                            subscription_list.add(subscrip_array.getString(j));
+                        }
+                    }
+                }
+
+                //return;
+            }
+            //Log.i(userObj.toString()+""+subscrip_array.toString()+"");
+
+            Intent intent=new Intent(con, PermissionForm.class);
+            intent.putExtra("shops",new Gson().toJson(shops));
+            intent.putExtra("subscriptions",new Gson().toJson(subscription_list));
+            con.startActivity(intent);
+
+        } catch (Exception e) {
+            Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
+        }
     }
 }

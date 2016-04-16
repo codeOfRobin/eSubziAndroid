@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,61 +43,28 @@ public class ProductDetails extends ActionBarActivity {
         edittext.setText(product.getDescription());
         edittext=(EditText)findViewById(R.id.p_discount);
         edittext.setText(Integer.toString(product.getDiscount()));
-
-        edittext.addTextChangedListener(new TextWatcher() {
+        Button update_disc =(Button) findViewById(R.id.update_disc);
+        update_disc.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+            public void onClick(View view) {
                 EditText editText = (EditText) findViewById(R.id.p_discount);
                 String discount = editText.getText().toString();
                 editText = (EditText) findViewById(R.id.p_discount);
                 discount = editText.getText().toString();
-
-                try{
-                    int we=Integer.parseInt(discount);
-                    VolleyClick.changeDiscountClick(product.getProductId(), Integer.parseInt(discount), ProductDetails.this);
-                }
-                catch (Exception e){
-                    Toast.makeText(ProductDetails.this, "Please enter valid price",
-                            Toast.LENGTH_LONG).show();
-                }
+                int we = Integer.parseInt(discount);
+                VolleyClick.changeDiscountClick(product.getProductId(), Integer.parseInt(discount), ProductDetails.this);
             }
         });
-        edittext=(EditText)findViewById(R.id.p_price);
-        edittext.addTextChangedListener(new TextWatcher() {
+        Button update_price =(Button) findViewById(R.id.update_price);
+        update_price.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+            public void onClick(View view) {
                 EditText editText=(EditText)findViewById(R.id.p_price);
-                try{
-                    int we=Integer.parseInt(editText.getText().toString());
-                    VolleyClick.updatePriceClick(product.getProductId(), Integer.parseInt(editText.getText().toString()),ProductDetails.this);
-                }
-                catch (Exception e){
-                    Toast.makeText(ProductDetails.this, "Please enter valid price",
-                            Toast.LENGTH_LONG).show();
-                }
-
+                VolleyClick.updatePriceClick(product.getProductId(), Integer.parseInt(editText.getText().toString()),ProductDetails.this);
             }
         });
+
+        edittext=(EditText)findViewById(R.id.p_price);
         edittext.setText(Integer.toString(product.getPrice()));
         edittext=(EditText)findViewById(R.id.p_quantity);
         edittext.setText(Integer.toString(product.getQuantity()));
@@ -120,29 +88,37 @@ public class ProductDetails extends ActionBarActivity {
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
+                        Intent intent = new Intent(ProductDetails.this, CreateDiscount.class);
+                        ProductDetails.this.startActivity(intent);
+                    } else {
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), ProductDetails.this);
+                    }
+                }
+                else if(position==4){
+
+                    if(pref.getString("type", "").equals("Shopkeeper"))
+                    {
                         ProductDetails.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                         Intent intent = new Intent(ProductDetails.this, Login.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         ProductDetails.this.startActivity(intent);
-                    } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), ProductDetails.this);
+                    }else{
+                        VolleyClick.logoutClick(pref.getString("deviceId",""),ProductDetails.this);
                     }
-                }
-                else if(position==4){
-                    ProductDetails.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(ProductDetails.this, Login.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    ProductDetails.this.startActivity(intent);
                 }
             }
         });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Products");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
         list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
             list.add("Log Out");
         }
         else{
@@ -210,7 +186,9 @@ public class ProductDetails extends ActionBarActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
     public void done(View view){

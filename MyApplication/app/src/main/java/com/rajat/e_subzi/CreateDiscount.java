@@ -1,111 +1,94 @@
 package com.rajat.e_subzi;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.rajat.e_subzi.Objects.OrderObject;
-import com.rajat.e_subzi.Objects.ProductObject;
-import com.rajat.e_subzi.Volley.VolleyClick;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rajat.e_subzi.Objects.ProductObject;
+import com.rajat.e_subzi.Volley.CallVolley;
+import com.rajat.e_subzi.Volley.VolleyClick;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
-
-public class Orders extends ActionBarActivity {
+/**
+ * Created by Rajat on 15-04-2016.
+ */
+public class CreateDiscount extends ActionBarActivity{
     ListView mRecyclerView;
-    String userId="56daf665a32c7f2c2ebda1a8";
-    String usertype="Customer";
-    ArrayList<OrderObject> orderObjList;
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
-//    public static ArrayList<TextView> a;
-    ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
-    public static TextView a;
-    public ArrayList<String> number;
-    public ArrayList<String> address;
+
+    ActionBarDrawerToggle mDrawerToggle;
+EditText descrition;
+    Button send;
+    //ArrayList<String>photoUrls = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_orders);
-        ActionBar actionBar;
-        orderObjList=(ArrayList<OrderObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
-                new TypeToken<ArrayList<OrderObject>>() {
-                }.getType());
-        number =(ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("userPhone"),
-                new TypeToken<ArrayList<String>>() {
-                }.getType());
-        address =(ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("userAddress"),
-                new TypeToken<ArrayList<String>>() {
-                }.getType());
-        Log.d("ffdgdgf", getIntent().getStringExtra("data"));
-        actionBar = getSupportActionBar();
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
-        actionBar.setBackgroundDrawable(colorDrawable);
-
-        ListView listView=(ListView)findViewById(R.id.orders);
-        String[] items={"Delievery","Delivery"};
-        String[] discounts={"1st Priority","2nd priority"};
-        Log.i("rajat","size:-"+orderObjList.size());
-        OrderListAdapter adapter=new OrderListAdapter(orderObjList,number,address,this);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        setContentView(R.layout.activity_create_discount);
+        descrition =(EditText) findViewById(R.id.desc_discount);
+        send= (Button)findViewById(R.id.send_discount);
+        send.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //add you code for networking here
+            public void onClick(View view) {
+                String discount= descrition.getText().toString();
+                VolleyClick.createDiscountClick(getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("userId",""),discount,CreateDiscount.this);
             }
         });
 
-
-        mRecyclerView = (ListView) findViewById(R.id.orders_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView = (ListView) findViewById(R.id.create_discount_nav); // Assigning the RecyclerView Object to the xml View
         mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                Log.d("sheck",pref.getString("type",""));
+
+                Log.d("sheck", pref.getString("type", ""));
                 Log.d("check",""+position);
                 if(position==1){
                     if (pref.getString("type","").equals("Shopkeeper")) {
-                        VolleyClick.findProductsClick(pref.getString("userId", ""), Orders.this);
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), CreateDiscount.this);
                     } else {
-                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Orders.this);
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), CreateDiscount.this);
                     }
                 }
                 else if(position==2){
-                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Orders.this);
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), CreateDiscount.this);
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        Intent intent = new Intent(Orders.this, CreateDiscount.class);
-                        Orders.this.startActivity(intent);
+                        Intent intent = new Intent(CreateDiscount.this, CreateDiscount.class);
+                        CreateDiscount.this.startActivity(intent);
                     } else {
-                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), Orders.this);
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), CreateDiscount.this);
                     }
                 }
                 else if(position==4){
 
                     if(pref.getString("type", "").equals("Shopkeeper"))
                     {
-                        Orders.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Orders.this, Login.class);
+                        CreateDiscount.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(CreateDiscount.this, Login.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        Orders.this.startActivity(intent);
+                        CreateDiscount.this.startActivity(intent);
                     }else{
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),Orders.this);
+                        VolleyClick.logoutClick(pref.getString("deviceId",""),CreateDiscount.this);
                     }
                 }
             }
@@ -171,7 +154,7 @@ public class Orders extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_orders, menu);
+        getMenuInflater().inflate(R.menu.menu_shops, menu);
         return true;
     }
 

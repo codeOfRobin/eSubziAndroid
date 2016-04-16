@@ -21,13 +21,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:layout_weight="0.35"
+                android:layout_weight="0.25"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Description : "
                 android:layout_gravity="center_vertical" />
-            <EditText android:text="@string/hello_world" android:layout_width="match_parent"
-                android:layout_weight="0.65"
+            <EditText android:text="@string/hello_world" android:layout_width="0dp"
+                android:layout_weight="0.75"
                 android:theme="@style/EditTextTheme"
                 android:layout_height="wrap_content"
                 android:id="@+id/p_desc"
@@ -40,34 +40,48 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:layout_weight="0.35"
+                android:layout_weight="0.25"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Price : "
                 android:layout_gravity="center_vertical" />
-            <EditText android:text="@string/hello_world" android:layout_width="match_parent"
-                android:layout_weight="0.65"
+            <EditText android:text="@string/value" android:layout_width="0dp"
+                android:layout_weight="0.4"
                 android:theme="@style/EditTextTheme"
                 android:layout_height="wrap_content"
+                android:inputType="number"
                 android:id="@+id/p_price"
                 android:layout_gravity="center_horizontal" />
+            <Button
+                android:layout_weight="0.35"
+                android:layout_width="0dp"
+                android:text="Update"
+                android:id="@+id/update_price"
+                android:layout_height="50dp" />
         </LinearLayout>
         <LinearLayout
             android:weightSum="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:layout_weight="0.35"
+                android:layout_weight="0.25"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Discount : "
                 android:layout_gravity="center_vertical" />
-            <EditText android:text="@string/hello_world" android:layout_width="match_parent"
-                android:layout_weight="0.65"
+            <EditText android:text="@string/hello_world" android:layout_width="0dp"
+                android:layout_weight="0.4"
                 android:theme="@style/EditTextTheme"
                 android:layout_height="wrap_content"
+                android:inputType="number"
                 android:id="@+id/p_discount"
                 android:layout_gravity="center_horizontal" />
+            <Button
+                android:layout_weight="0.35"
+                android:layout_width="0dp"
+                android:text="Update"
+                android:id="@+id/update_disc"
+                android:layout_height="50dp" />
         </LinearLayout>
         <LinearLayout
             android:weightSum="1"
@@ -75,13 +89,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:layout_weight="0.35"
+                android:layout_weight="0.25"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Quantity : "
                 android:layout_gravity="center_vertical" />
-            <EditText android:text="@string/hello_world" android:layout_width="match_parent"
-                android:layout_weight="0.65"
+            <EditText android:text="@string/hello_world" android:layout_width="0dp"
+                android:layout_weight="0.75"
                 android:theme="@style/EditTextTheme"
                 android:layout_height="wrap_content"
                 android:id="@+id/p_quantity"

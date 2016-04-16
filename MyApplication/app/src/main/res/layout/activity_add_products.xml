@@ -16,6 +16,7 @@ android:elevation="7dp">
         android:orientation="vertical">
 
         <EditText
+            android:inputType="textPersonName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Fruit/Vegetable Name"
@@ -27,6 +28,7 @@ android:elevation="7dp">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Price"
+            android:inputType="number"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:theme="@style/EditTextTheme"
@@ -34,6 +36,7 @@ android:elevation="7dp">
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="number"
             android:hint="Discounts"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"

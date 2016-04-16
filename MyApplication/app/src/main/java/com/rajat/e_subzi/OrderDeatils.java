@@ -58,29 +58,37 @@ public class OrderDeatils extends ActionBarActivity {
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
+                        Intent intent = new Intent(OrderDeatils.this, CreateDiscount.class);
+                        OrderDeatils.this.startActivity(intent);
+                    } else {
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), OrderDeatils.this);
+                    }
+                }
+                else if(position==4){
+
+                    if(pref.getString("type", "").equals("Shopkeeper"))
+                    {
                         OrderDeatils.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                         Intent intent = new Intent(OrderDeatils.this, Login.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         OrderDeatils.this.startActivity(intent);
-                    } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), OrderDeatils.this);
+                    }else{
+                        VolleyClick.logoutClick(pref.getString("deviceId",""),OrderDeatils.this);
                     }
-                }
-                else if(position==4){
-                    OrderDeatils.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(OrderDeatils.this, Login.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    OrderDeatils.this.startActivity(intent);
                 }
             }
         });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Products");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
         list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
             list.add("Log Out");
         }
         else{
@@ -147,7 +155,9 @@ public class OrderDeatils extends ActionBarActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }

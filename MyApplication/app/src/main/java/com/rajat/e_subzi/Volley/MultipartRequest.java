@@ -1,7 +1,7 @@
-package com.rajat.e_subzi.Tools;
+package com.rajat.e_subzi.Volley;
 
 /**
- * Created by Rajat on 12-04-2016.
+ * Created by Rajat on 15-04-2016.
  */
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -13,14 +13,14 @@ import com.android.volley.toolbox.HttpHeaderParser;
 
 import java.util.Map;
 
-public class MultipartyRequest extends Request<NetworkResponse> {
+class MultipartRequest extends Request<NetworkResponse> {
     private final Response.Listener<NetworkResponse> mListener;
     private final Response.ErrorListener mErrorListener;
     private final Map<String, String> mHeaders;
     private final String mMimeType;
     private final byte[] mMultipartBody;
 
-    public MultipartyRequest(String url, Map<String, String> headers, String mimeType, byte[] multipartBody, Response.Listener<NetworkResponse> listener, Response.ErrorListener errorListener) {
+    public MultipartRequest(String url, Map<String, String> headers, String mimeType, byte[] multipartBody, Response.Listener<NetworkResponse> listener, Response.ErrorListener errorListener) {
         super(Method.POST, url, errorListener);
         this.mListener = listener;
         this.mErrorListener = errorListener;
@@ -65,3 +65,4 @@ public class MultipartyRequest extends Request<NetworkResponse> {
         mErrorListener.onErrorResponse(error);
     }
 }
+

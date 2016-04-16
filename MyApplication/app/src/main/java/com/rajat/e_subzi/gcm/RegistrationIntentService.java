@@ -29,6 +29,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.rajat.e_subzi.Discounts;
 import com.rajat.e_subzi.R;
+import com.rajat.e_subzi.Shops;
 import com.rajat.e_subzi.Volley.VolleyClick;
 
 import java.io.IOException;
@@ -90,7 +91,7 @@ public class RegistrationIntentService extends IntentService {
      */
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
-        VolleyClick.registerDeviceClick(token, getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("email",""), "Android", Discounts.context);
+        VolleyClick.registerDeviceClick(token, getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("email",""), "Android", Shops.context);
 
     }
 

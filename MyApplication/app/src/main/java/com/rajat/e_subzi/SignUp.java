@@ -74,7 +74,9 @@ public class SignUp extends ActionBarActivity implements AdapterView.OnItemSelec
     public void signup(View view){
         TextView user=(TextView) findViewById(R.id.username);
         TextView pass=(TextView) findViewById(R.id.password);
-        VolleyClick.signUp(user.getText().toString(), pass.getText().toString(), spinner.getSelectedItem().toString(),this);
+        TextView address=(TextView) findViewById(R.id.address);
+        TextView phoneNum=(TextView) findViewById(R.id.phoneNumber);
+        VolleyClick.signUp(user.getText().toString(), pass.getText().toString(),address.getText().toString(),phoneNum.getText().toString(), spinner.getSelectedItem().toString(),this);
 
     }
 }

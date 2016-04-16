@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.rajat.e_subzi.Objects.OrderObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Rajat on 13-04-2016.
@@ -20,10 +21,13 @@ import java.util.ArrayList;
 public class ShopsAdapter extends BaseAdapter {
     ArrayList<String > shops;
     Context context;
-    public ShopsAdapter(ArrayList<String> shops,Context context){
+    HashMap<String ,ArrayList<String>>photoUrl;
+
+    public ShopsAdapter(ArrayList<String> shops,HashMap<String ,ArrayList<String>>photoUrl,Context context){
         super();
         this.shops=shops;
         this.context=context;
+        this.photoUrl=photoUrl;
 
     }
 
@@ -44,12 +48,18 @@ public class ShopsAdapter extends BaseAdapter {
     public View getView(final int position, final View view, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.shop_list_view, null, true);
+
+
         row.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ArrayList<String> photoUrls = new ArrayList<String>();
+                photoUrls=photoUrl.get(shops.get(position));
                 Intent intent=new Intent(context,Discounts.class);
                 intent.putExtra("data", new Gson().toJson(Shops.shop_discount_details.get(shops.get(position))));
-                context.startActivity(intent);
+
+                intent.putExtra("photoUrl", new Gson().toJson(photoUrls));
+                        context.startActivity(intent);
             }
         });
         TextView t=(TextView) row.findViewById(R.id.shp);

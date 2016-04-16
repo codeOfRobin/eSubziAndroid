@@ -29,6 +29,7 @@
         android:layout_height="50dp"
         android:scaleType="fitXY"
         android:background="@drawable/sample"
+            android:id="@+id/disc_image"
         android:src="@drawable/circular"
         android:translationZ="20dp" />
     <!--<de.hdodenhof.circleimageview.CircleImageView-->

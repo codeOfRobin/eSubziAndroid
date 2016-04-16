@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.google.gson.Gson;
+import com.rajat.e_subzi.Volley.CallVolley;
 
 import java.util.ArrayList;
 
@@ -22,9 +23,11 @@ import java.util.ArrayList;
 public class ProductsGridAdapter extends BaseAdapter {
      Context context;
     ArrayList<ProductObject> productObjList = new ArrayList<ProductObject>();
-    public ProductsGridAdapter(Context context,int count,ArrayList<ProductObject> productObjList){
-        super();
+    ArrayList<String> photoUrls =new ArrayList<String>();
+    public ProductsGridAdapter(Context context,int count,ArrayList<ProductObject> productObjList,ArrayList<String>photoUrls){
 
+        super();
+    this.photoUrls=photoUrls;
         this.productObjList=productObjList;
         this.context=context;
     }
@@ -47,18 +50,21 @@ public class ProductsGridAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.products_grid_view, null, true);
         ImageView imageView=(ImageView)row.findViewById(R.id.product_image);
+        CallVolley.getBitmapFromUrl(photoUrls.get(position),context,imageView);
 //        imageView.setImageResource(product_image.get(position));
         TextView textView=(TextView)row.findViewById(R.id.product_text);
         textView.setText(productObjList.get(position).getDescription());
         ImageButton button=(ImageButton) row.findViewById(R.id.edit_product);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context,ProductDetails.class);
-                intent.putExtra("data",new Gson().toJson(productObjList.get(position)));
+                Intent intent = new Intent(context, ProductDetails.class);
+                intent.putExtra("data", new Gson().toJson(productObjList.get(position)));
                 context.startActivity(intent);
             }
         });
         return row;
     }
+
 }

@@ -71,29 +71,35 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        AddOrder.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(AddOrder.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        Intent intent = new Intent(AddOrder.this, CreateDiscount.class);
                         AddOrder.this.startActivity(intent);
                     } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), AddOrder.this);
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), AddOrder.this);
                     }
                 }
                 else if(position==4){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
                     AddOrder.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
                     Intent intent = new Intent(AddOrder.this, Login.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     AddOrder.this.startActivity(intent);
+                    }else{
+                        VolleyClick.logoutClick(pref.getString("deviceId",""),AddOrder.this);
+                    }
                 }
             }
         });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Products");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
         list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
             list.add("Log Out");
         }
         else{
