@@ -19,6 +19,8 @@
             android:layout_height="match_parent"
             android:text="sfdssfds"
             android:gravity="center"
+            android:textAppearance="?attr/textAppearanceLargePopupMenu"
+            android:textColor="#ffb40a98"
             android:id="@+id/shp" />
     </android.support.v7.widget.CardView>
 

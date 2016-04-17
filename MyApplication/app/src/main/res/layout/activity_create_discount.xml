@@ -18,6 +18,7 @@
 <Button
     android:layout_marginTop="50dp"
     android:id="@+id/send_discount"
+    android:textColor="#ffb40a98"
     android:layout_below="@id/desc_discount"
     android:text="Notify Discount"
     android:layout_centerHorizontal="true"

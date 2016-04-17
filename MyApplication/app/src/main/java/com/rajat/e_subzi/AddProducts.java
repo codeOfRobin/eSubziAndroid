@@ -148,10 +148,7 @@ imgPreview =new ImageView(AddProducts.this);
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        AddProducts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(AddProducts.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        Intent intent = new Intent(AddProducts.this, CreateDiscount.class);
                         AddProducts.this.startActivity(intent);
                     } else {
                         VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), AddProducts.this);
@@ -173,6 +170,7 @@ imgPreview =new ImageView(AddProducts.this);
         }
         list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
             list.add("Log Out");
         }
         else{

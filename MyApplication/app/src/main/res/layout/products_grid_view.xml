@@ -46,7 +46,7 @@
         <ImageButton
             android:layout_width="53dp"
             android:layout_height="53dp"
-            android:src="@drawable/ic_turned_in_black_24dp"
+            android:src="@drawable/red_cross_tick"
             android:scaleType="fitXY"
             android:id="@+id/delete_product"/>
 
