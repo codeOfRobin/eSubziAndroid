@@ -93,16 +93,9 @@ ArrayList<ShopObject> shops;
                 }
                 else if(position==4){
 
-                    if(pref.getString("type", "").equals("Shopkeeper"))
-                    {
-                        PermissionForm.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(PermissionForm.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        PermissionForm.this.startActivity(intent);
-                    }else{
+
                         VolleyClick.logoutClick(pref.getString("deviceId",""),PermissionForm.this);
-                    }
+
                 }
             }
         });

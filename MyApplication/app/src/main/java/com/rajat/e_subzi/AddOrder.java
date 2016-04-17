@@ -14,6 +14,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
@@ -78,15 +79,9 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
                     }
                 }
                 else if(position==4){
-                    if (pref.getString("type", "").equals("Shopkeeper")) {
-                    AddOrder.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(AddOrder.this, Login.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    AddOrder.this.startActivity(intent);
-                    }else{
+
                         VolleyClick.logoutClick(pref.getString("deviceId",""),AddOrder.this);
-                    }
+
                 }
             }
         });
@@ -202,14 +197,20 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
         Iterator it = data.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
+            if(!pair.getValue().equals(0)){
             productIds.add(pair.getKey().toString());
             quantities.add((Float)pair.getValue());
+            }
             System.out.println(pair.getKey() + " = " + pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         Log.d("rajar",Integer.toString(productIds.size()));
-        VolleyClick.placeOrderClick(pref.getString("userId"," "),pref.getString("email"," "),productObjList.get(0).getUserId(), productIds, quantities,this);
+        if(quantities.size()>0) {
+            VolleyClick.placeOrderClick(pref.getString("userId", " "), pref.getString("email", " "), productObjList.get(0).getUserId(), productIds, quantities, this);
+        }else{
+            Toast.makeText(this,"All quantities are 0",Toast.LENGTH_SHORT).show();
+        }
     }
     public void onItemSelected(AdapterView<?> parent, View view, int position,
                                long id) {

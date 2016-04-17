@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -49,12 +50,14 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
     private static final String TAG = "Discounts";
     public static Context context;
+    public static LinearLayout lay;
     private ProgressBar mRegistrationProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discounts);
         context=Discounts.this;
+        lay = (LinearLayout)findViewById(R.id.layout_root);
        // ActionBar actionBar;
         productObjList=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
                 new TypeToken<ArrayList<ProductObject>>() {
@@ -116,16 +119,9 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
                 }
                 else if(position==4){
 
-                    if(pref.getString("type", "").equals("Shopkeeper"))
-                    {
-                        Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Discounts.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        Discounts.this.startActivity(intent);
-                    }else{
+
                         VolleyClick.logoutClick(pref.getString("deviceId",""),Discounts.this);
-                    }
+
                 }
             }
         });

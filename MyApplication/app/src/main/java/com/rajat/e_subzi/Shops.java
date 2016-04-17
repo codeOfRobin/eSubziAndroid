@@ -115,16 +115,16 @@ public class Shops extends ActionBarActivity {
                 }
                 else if(position==4){
 
-                    if(pref.getString("type", "").equals("Shopkeeper"))
-                    {
-                        Shops.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Shops.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        Shops.this.startActivity(intent);
-                    }else{
+//                    if(pref.getString("type", "").equals("Shopkeeper"))
+//                    {
+//                        Shops.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+//                        Intent intent = new Intent(Shops.this, Login.class);
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        Shops.this.startActivity(intent);
+//                    }else{
                         VolleyClick.logoutClick(pref.getString("deviceId",""),Shops.this);
-                    }
+                    //}
                 }
             }
         });

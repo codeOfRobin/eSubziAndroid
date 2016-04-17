@@ -78,18 +78,18 @@ public class JSONParser {
                     editor.putString("type", type);
                 }
                 editor.commit();
-
+                if(type.equals("Shopkeeper")){
+                    VolleyClick.findProductsClick(userId,con);
+                }
+                else{
+                    VolleyClick.findDiscountsClick(userId,con);
+                }
             } else if (resultJson.has("error")) {
                 error = resultJson.getString("error");
             }
             Log.i("rajat", email + " " + userId + " " + token + " " + type + " " + error);
 //            Tools.showAlertDialog(email + " " + userId + " " + token + " " + type + " " + error, con);
-            if(type.equals("Shopkeeper")){
-                VolleyClick.findProductsClick(userId,con);
-            }
-            else{
-                VolleyClick.findDiscountsClick(userId,con);
-            }
+
         } catch (Exception e) {
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
         }
@@ -130,17 +130,20 @@ public class JSONParser {
                     editor.putString("type", type);
                 }
                 editor.commit();
+                if(type.equals("Shopkeeper")){
+                    VolleyClick.findProductsClick(userId,con);
+                }
+                else{
+
+                    VolleyClick.findDiscountsClick(userId,con);
+                }
             } else if (resultJson.has("error")) {
                 error = resultJson.getString("error");
+                Toast.makeText(con, "Invalid "+resultJson.getString("error"),
+                        Toast.LENGTH_LONG).show();
             }
 
-            if(type.equals("Shopkeeper")){
-                VolleyClick.findProductsClick(userId,con);
-            }
-            else{
 
-                VolleyClick.findDiscountsClick(userId,con);
-            }
 
 
             Log.i("rajat", email + " " + userId + " " + token + " " + type + " " + error);
@@ -158,8 +161,36 @@ public class JSONParser {
         }
     }
 
-    //
-    public static void CreateProductApiJsonParser(String JsonStringResult,final Context con,final File file,Map<String,String> pprams,Response.Listener<String> mlistener, Response.ErrorListener err) {
+    //DeleteProductApiJsonParser
+    public static void DeleteProductApiJsonParser(String JsonStringResult,final String userId,final Context con) {
+        try {
+
+
+            String message = "";
+            //create json object from response string
+            JSONObject resultJson = new JSONObject(JsonStringResult);
+            if (resultJson.has("message")) {
+
+                message = resultJson.getString("message");
+                if(message.equals("product removed")){
+                    Log.i("rajat",  message);
+                    VolleyClick.findProductsClick(userId, con);
+                    //VolleyClick.fin
+                }else if(message.equals("error")){
+                    Toast.makeText(con, message +" occured", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(con, message, Toast.LENGTH_SHORT).show();
+                }
+            }
+            Log.i("rajat",  message);
+//            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
+        }
+    }
+    public static void CreateProductApiJsonParser(String JsonStringResult,final Context con,final File file) {
         try {
 
             JSONObject product;

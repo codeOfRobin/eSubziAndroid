@@ -59,7 +59,7 @@ public class AddOrderAdapter extends BaseAdapter {
             public void onClick(View v) {
                 TextView t=(TextView) row.findViewById(R.id.amt);
                 if(Float.parseFloat((String) t.getText())>(float)0.0){
-                    t.setText(Float.toString(Float.parseFloat((String) t.getText())-(float)0.5));
+                    t.setText(Float.toString(Float.parseFloat((String) t.getText())-(float)1));
                     AddOrder.data.put(discounts.get(position).getProductId(),Float.parseFloat((String) t.getText()));
 
 
@@ -72,8 +72,8 @@ public class AddOrderAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 TextView t=(TextView) row.findViewById(R.id.amt);
-                if (AddOrder.data_quantity.get(discounts.get(position).getProductId()) >= Float.parseFloat((String) t.getText())+(float)0.5){
-                    t.setText(Float.toString(Float.parseFloat((String) t.getText())+(float)0.5));
+                if (AddOrder.data_quantity.get(discounts.get(position).getProductId()) >= Float.parseFloat((String) t.getText())+(float)1){
+                    t.setText(Float.toString(Float.parseFloat((String) t.getText())+(float)1));
                     AddOrder.data.put(discounts.get(position).getProductId(), Float.parseFloat((String) t.getText()));
                 }
                 else{

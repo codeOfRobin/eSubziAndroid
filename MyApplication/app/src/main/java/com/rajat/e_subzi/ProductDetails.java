@@ -48,19 +48,51 @@ public class ProductDetails extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 EditText editText = (EditText) findViewById(R.id.p_discount);
-                String discount = editText.getText().toString();
+                String discount;
                 editText = (EditText) findViewById(R.id.p_discount);
                 discount = editText.getText().toString();
-                int we = Integer.parseInt(discount);
-                VolleyClick.changeDiscountClick(product.getProductId(), Integer.parseInt(discount), ProductDetails.this);
+
+                EditText price =(EditText)findViewById(R.id.p_price);
+                String prices=price.getText().toString();
+                if(!prices.equals("")  && !discount.equals("")){
+                    int p_discount = Integer.parseInt(discount);
+                    int p_price =Integer.parseInt(price.getText().toString());
+                    if( p_discount < p_price){
+                        VolleyClick.changeDiscountClick(product.getProductId(), Integer.parseInt(discount), ProductDetails.this);
+                    }else{
+                        Toast.makeText(ProductDetails.this,"Discount should be less than price",Toast.LENGTH_SHORT).show();
+                    }
+
+                }else if(prices.equals("") || discount.equals("")){
+                    Toast.makeText(ProductDetails.this,"Provide values for price and discount",Toast.LENGTH_SHORT).show();
+                }
             }
         });
         Button update_price =(Button) findViewById(R.id.update_price);
         update_price.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText editText=(EditText)findViewById(R.id.p_price);
-                VolleyClick.updatePriceClick(product.getProductId(), Integer.parseInt(editText.getText().toString()),ProductDetails.this);
+                EditText editText = (EditText) findViewById(R.id.p_discount);
+                String discount;
+                editText = (EditText) findViewById(R.id.p_discount);
+                discount = editText.getText().toString();
+
+                EditText price =(EditText)findViewById(R.id.p_price);
+                String prices=price.getText().toString();
+
+                if(!prices.equals("")  && !discount.equals("")){
+                    int p_discount = Integer.parseInt(discount);
+                    int p_price =Integer.parseInt(price.getText().toString());
+                    if( p_discount < p_price){
+                        VolleyClick.updatePriceClick(product.getProductId(), p_price,ProductDetails.this);
+                    }else{
+                        Toast.makeText(ProductDetails.this,"Discount should be less than price",Toast.LENGTH_SHORT).show();
+                    }
+
+                }else if(prices.equals("") || discount.equals("")){
+                    Toast.makeText(ProductDetails.this,"Provide values for price and discount",Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -96,16 +128,8 @@ public class ProductDetails extends ActionBarActivity {
                 }
                 else if(position==4){
 
-                    if(pref.getString("type", "").equals("Shopkeeper"))
-                    {
-                        ProductDetails.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(ProductDetails.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        ProductDetails.this.startActivity(intent);
-                    }else{
                         VolleyClick.logoutClick(pref.getString("deviceId",""),ProductDetails.this);
-                    }
+
                 }
             }
         });

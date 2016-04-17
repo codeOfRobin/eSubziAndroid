@@ -66,16 +66,9 @@ public class OrderDeatils extends ActionBarActivity {
                 }
                 else if(position==4){
 
-                    if(pref.getString("type", "").equals("Shopkeeper"))
-                    {
-                        OrderDeatils.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(OrderDeatils.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        OrderDeatils.this.startActivity(intent);
-                    }else{
+
                         VolleyClick.logoutClick(pref.getString("deviceId",""),OrderDeatils.this);
-                    }
+
                 }
             }
         });

@@ -85,15 +85,18 @@ public class OrderListAdapter extends BaseAdapter{
             textView.setVisibility(View.GONE);
             TextView t=(TextView)row.findViewById(mapping.get(orderObjects.get(position).getCurrentState()));
             t.setTextColor(Color.parseColor("#76ff03"));
-            Orders.a=t;
+            //Orders.a=t;
+            Orders.as.set(position,t);
             t=(TextView)row.findViewById(R.id.one);
             t.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     TextView p=(TextView) v;
                     p.setTextColor(Color.parseColor("#76ff03"));
+                    Orders.as.get(position).setTextColor(Color.WHITE);
                     VolleyClick.changeOrderStateClick(orderObjects.get(position).getOrderId().toString(), p.getText().toString(), context);
-                    Orders.a=p;
+                    Orders.as.set(position,p);
+                   // Orders.a=p;
                 }
             });
 
@@ -103,9 +106,9 @@ public class OrderListAdapter extends BaseAdapter{
                 public void onClick(View v) {
                     TextView p=(TextView) v;
                     p.setTextColor(Color.parseColor("#76ff03"));
-                    Orders.a.setTextColor(Color.WHITE);
+                    Orders.as.get(position).setTextColor(Color.WHITE);
                     VolleyClick.changeOrderStateClick(orderObjects.get(position).getOrderId().toString(), p.getText().toString(), context);
-                    Orders.a=p;
+                    Orders.as.set(position,p);
                 }
             });
             t=(TextView)row.findViewById(R.id.three);
@@ -114,9 +117,11 @@ public class OrderListAdapter extends BaseAdapter{
                 public void onClick(View v) {
                     TextView p=(TextView) v;
                     p.setTextColor(Color.parseColor("#76ff03"));
-                    Orders.a.setTextColor(Color.WHITE);
+                    //Orders.a.setTextColor(Color.WHITE);
+                    Orders.as.get(position).setTextColor(Color.WHITE);
                     VolleyClick.changeOrderStateClick(orderObjects.get(position).getOrderId().toString(), p.getText().toString(), context);
-                    Orders.a=p;
+                    //Orders.a=p;
+                    Orders.as.set(position,p);
                 }
             });
             t=(TextView)row.findViewById(R.id.four);
@@ -125,9 +130,9 @@ public class OrderListAdapter extends BaseAdapter{
                 public void onClick(View v) {
                     TextView p=(TextView) v;
                     p.setTextColor(Color.parseColor("#76ff03"));
-                    Orders.a.setTextColor(Color.WHITE);
+                    Orders.as.get(position).setTextColor(Color.WHITE);
                     VolleyClick.changeOrderStateClick(orderObjects.get(position).getOrderId().toString(), p.getText().toString(), context);
-                    Orders.a=p;
+                    Orders.as.set(position,p);
                 }
             });
         }

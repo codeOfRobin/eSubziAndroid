@@ -80,16 +80,9 @@ EditText descrition;
                 }
                 else if(position==4){
 
-                    if(pref.getString("type", "").equals("Shopkeeper"))
-                    {
-                        CreateDiscount.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(CreateDiscount.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        CreateDiscount.this.startActivity(intent);
-                    }else{
+
                         VolleyClick.logoutClick(pref.getString("deviceId",""),CreateDiscount.this);
-                    }
+
                 }
             }
         });

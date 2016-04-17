@@ -54,9 +54,7 @@ import java.util.Map;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
-import retrofit2.http.Multipart;
-import retrofit2.http.PUT;
-import retrofit2.http.Part;
+
 
 
 public class AddProducts extends ActionBarActivity implements AdapterView.OnItemSelectedListener {
@@ -160,16 +158,9 @@ imgPreview =new ImageView(AddProducts.this);
                     }
                 }
                 else if(position==4){
-                    if(pref.getString("type", "").equals("Shopkeeper"))
-                    {
-                        AddProducts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(AddProducts.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        AddProducts.this.startActivity(intent);
-                    }else{
+
                         VolleyClick.logoutClick(pref.getString("deviceId",""),AddProducts.this);
-                    }
+
                 }
             }
         });
@@ -366,26 +357,6 @@ imgPreview =new ImageView(AddProducts.this);
 
     public void addProduct(View view){
 
-
-        Response.Listener<String> mListener=new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d("rishab","sdasda");
-            }
-        };
-//        MultipartRequest.MultipartProgressListener listener=new MultipartRequest.MultipartProgressListener() {
-//            @Override
-//            public void transferred(long transfered, int progress) {
-//                Log.d("rishab prog",""+transfered+"  "+progress);
-//            }
-//        };
-        Response.ErrorListener err=new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("err",error.toString());
-            }
-        };
-
         EditText editText=(EditText)findViewById(R.id.item_name);
         String name=(String)editText.getText().toString();
         editText=(EditText)findViewById(R.id.item_price);
@@ -394,16 +365,27 @@ imgPreview =new ImageView(AddProducts.this);
         String discount=(String)editText.getText().toString();
         Spinner spinner=(Spinner) findViewById(R.id.spinner1);
         String amount=spinner.getSelectedItem().toString();
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        //String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         if(file!=null){
             Log.i("rajat","not null2");
         }
-        VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId","0"),pref.getString("email","0"), Integer.parseInt(discount),this,file,null,mListener,err);
+        if(!name.equals("")&&!price.equals("")&& !amount.equals("Quantity(in kgs):")&& !discount.equals("")){
+            VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId", "0"), pref.getString("email", "0"), Integer.parseInt(discount), this, file);
+        }else if(name.equals("")){
+            Toast.makeText(this,"Provide the product name",Toast.LENGTH_SHORT).show();
+        }else if(price.equals("")) {
+            Toast.makeText(this,"Enter the price of product",Toast.LENGTH_SHORT).show();
+        }else if(discount.equals("")){
+            Toast.makeText(this,"Enter the discount on product",Toast.LENGTH_SHORT).show();
+        }else if(amount.equals("Quantity(in kgs):")){
+            Toast.makeText(this,"Enter the quantity of product",Toast.LENGTH_SHORT).show();
+        }
 //        @Multipart
 //        @PUT("user/photo")
 //        Call<User> updateUser(@Part("photo") RequestBody photo, @Part("description") RequestBody description);
         //add the networking code here
     }
+
     public void cancel(View view){
         this.finish();
     }

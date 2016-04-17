@@ -28,7 +28,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:scaleType="fitXY"
-        android:background="@drawable/sample"
+        android:background="@drawable/bag"
             android:id="@+id/disc_image"
         android:src="@drawable/circular"
         android:translationZ="20dp" />
