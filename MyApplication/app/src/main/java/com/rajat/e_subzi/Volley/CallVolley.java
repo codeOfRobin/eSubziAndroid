@@ -2,19 +2,30 @@ package com.rajat.e_subzi.Volley;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import com.google.gson.Gson;
 import com.rajat.e_subzi.AddProducts;
+import com.rajat.e_subzi.Login;
 import com.rajat.e_subzi.LoginActivity;
-import com.rajat.e_subzi.Tools.MultipartRequest;
+import com.rajat.e_subzi.PermissionForm;
 import com.rajat.e_subzi.Tools.Tools;
 
 import org.json.JSONArray;
@@ -36,8 +47,11 @@ public class CallVolley {
                 Log.i("rajat", "setCustomRetryPolicy");
                 jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         }
-
-        public static void signUpCall(String url, final Context context, final String email,final String password,final String type,final int Number)
+        private static void setCustomRetryPolicy(JsonObjectRequest jsonObjReq) {
+                Log.i("rajat", "setCustomRetryPolicy");
+                jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        }
+        public static void signUpCall(String url, final Context context, final String email,final String password,final String address, final String phoneNum,final String type,final int Number)
         {
                 pDialog=  Tools.showProgressBar(context);
 
@@ -50,9 +64,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.SignUpApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -68,6 +83,7 @@ public class CallVolley {
                         public void onErrorResponse(VolleyError error)
                         {
                                 Log.i("rajat", "onErrorResponse" + error.toString());
+                                error.printStackTrace();
                                 pDialog.dismiss();
                         }
                 }){
@@ -81,6 +97,8 @@ public class CallVolley {
                                 params.put("email",email);
                                 params.put("password",password);
                                 params.put("userType",type);
+                                params.put("address",address);
+                                params.put("phoneNumber",phoneNum);
                                 return params;
                         }
                 };
@@ -102,10 +120,76 @@ public class CallVolley {
                         {
                                 try
                                 {
+                                        pDialog.dismiss();
                                         Log.i("rajat", " onResponseActive " + response);
                                         JSONParser.LoginApiJsonParser(response, context);
 
+
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                pDialog.dismiss();
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                if(error.toString().equals("com.android.volley.AuthFailureError")){
+                                        Toast.makeText(context,"Authentication failed",Toast.LENGTH_SHORT).show();
+                                }else{
+                                        Toast.makeText(context,"Connection Error",Toast.LENGTH_SHORT).show();
+                                }
+
+
+                        }
+                }){
+                        @Override
+                        public String getBodyContentType() {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+                                params.put("email",email);
+                                params.put("password",password);
+                                return params;
+                        }
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+
+        public static void logoutCall(String url, final Context context, final String deviceId,final int Number)
+        {
+                pDialog=  Tools.showProgressBar(context);
+
+                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
                                         pDialog.dismiss();
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        //JSONParser.LogoutApiJsonParser(response, context);
+                                        context.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                                        Intent intent = new Intent(context, Login.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        context.startActivity(intent);
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -131,8 +215,8 @@ public class CallVolley {
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
                                 Map<String, String> params = new HashMap<>();
-                                params.put("email",email);
-                                params.put("password",password);
+                                params.put("id",deviceId);
+                                //params.put("userType",userType);
                                 return params;
                         }
                 };
@@ -142,8 +226,7 @@ public class CallVolley {
                 //get instance of volleysingleton and add reuest to the queue
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
-        public static void createProductCall(String url, final Context context,final int price ,final int quantity,final String description,final String userId ,final int discount,final int Number,final File file, final Map<String,String> pprams,
-                                             final Response.Listener<String> mlistener,final Response.ErrorListener err, final MultipartRequest.MultipartProgressListener listener)
+        public static void createProductCall(String url, final Context context,final int price ,final int quantity,final String description,final String userId ,final String userEmail,final int discount,final Boolean deliveryAvailable,final int Number,final File file)
         {
 
                 pDialog=  Tools.showProgressBar(context);
@@ -156,10 +239,11 @@ public class CallVolley {
                         {
                                 try
                                 {
-                                        Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.CreateProductApiJsonParser(response, context, file, pprams, mlistener, err, listener);
-//                                        JSONParser.FindProductsApiJsonParser(response, context);
                                         pDialog.dismiss();
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        JSONParser.CreateProductApiJsonParser(response, context, file);
+//                                        JSONParser.FindProductsApiJsonParser(response, context);
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -196,7 +280,10 @@ public class CallVolley {
                                 params.put("quantity",quantity+"");
                                 params.put("description",description);
                                 params.put("userId",userId);
+                                params.put("userEmail",userEmail);
                                 params.put("discount",""+discount);
+                                params.put("deliverable",deliveryAvailable+"");
+
                                 return params;
                         }
                 };
@@ -206,8 +293,7 @@ public class CallVolley {
                 //get instance of volleysingleton and add reuest to the queue
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
-
-        public static void findProductsCall(String url, final Context context,final String userId,final int Number)
+        public static void createDiscountCall(String url, final Context context,final String shopId,final String discountDesc,final int Number)
         {
                 pDialog=  Tools.showProgressBar(context);
 
@@ -219,10 +305,11 @@ public class CallVolley {
                         {
                                 try
                                 {
-                                        Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.FindProductsApiJsonParser(response, context);
-
                                         pDialog.dismiss();
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        //JSONParser.CreateDiscountApiJsonParser(response, context);
+
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -238,6 +325,67 @@ public class CallVolley {
                         public void onErrorResponse(VolleyError error)
                         {
                                 Log.i("rajat", "onErrorResponse" + error.toString());
+                                pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs",Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+                        @Override
+                        public String getBodyContentType() {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+                                params.put("shopKeeperId", shopId);
+                                params.put("discountDescription", discountDesc);
+                                return params;
+                        }
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+        public static void findProductsCall(String url, final Context context,final String userId,final int Number)
+        {
+                pDialog=  Tools.showProgressBar(context);
+
+                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
+                                        JSONParser.FindProductsApiJsonParser(response, context);
+
+
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                error.printStackTrace();
                                 pDialog.dismiss();
                         }
                 }){
@@ -266,10 +414,123 @@ public class CallVolley {
                 //get instance of volleysingleton and add reuest to the queue
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
+        public static void deleteProductCall(String url, final Context context,final String productId,final String userId,final int Number)
+        {
+                pDialog=  Tools.showProgressBar(context);
 
+                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
+
+                                        JSONParser.DeleteProductApiJsonParser(response, userId, context);
+
+
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                error.printStackTrace();
+                                pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+                        @Override
+                        public String getBodyContentType() {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+
+                                params.put("id",productId);
+                                return params;
+                        }
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+        public static void findOffersCall(String url, final Context context,final int Number)
+        {
+                pDialog=  Tools.showProgressBar(context);
+
+                StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
+
+                                        JSONParser.FindOffersApiJsonParser(response, context);
+
+
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                error.printStackTrace();
+                                pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
         public static void findDiscountsCall(String url, final Context context,final String userId,final int Number)
         {
-//                pDialog=  Tools.showProgressBar(context);
+                pDialog=  Tools.showProgressBar(context);
 
                 StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>()
                 {
@@ -280,9 +541,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat_  ", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.FindDiscountsApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -347,6 +609,7 @@ public class CallVolley {
                         public void onErrorResponse(VolleyError error)
                         {
                                 Log.i("rajat", "onErrorResponse" + error.toString());
+                                error.printStackTrace();
                                 //pDialog.dismiss();
                         }
                 }){
@@ -354,7 +617,7 @@ public class CallVolley {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                                 //Log.i("size in getHeader: ",myHeaders.size()+"");
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
-                                mHeaders.put("x-access-token", context.getApplicationContext().getSharedPreferences("MyPrefs", context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                mHeaders.put("x-access-token", context.getApplicationContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
                         @Override
@@ -389,10 +652,11 @@ public class CallVolley {
                         {
                                 try
                                 {
+                                        pDialog.dismiss();
                                         Log.i("rajat", " onResponseActive " + response);
                                         JSONParser.UpdateProductPriceApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -436,7 +700,126 @@ public class CallVolley {
                 //get instance of volleysingleton and add reuest to the queue
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
+        public static void updateProductQuantityCall(String url, final Context context,final String productId,final int quantity,final int Number)
+        {
+                pDialog=  Tools.showProgressBar(context);
 
+                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
+                                        pDialog.dismiss();
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        JSONParser.UpdateProductQuantityApiJsonParser(response, context);
+
+
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+                        @Override
+                        public String getBodyContentType() {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+                                params.put("id",productId);
+                                params.put("quantity",quantity+"");
+                                return params;
+                        }
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+        public static void updateProductNameCall(String url, final Context context,final String productId,final String description,final int Number)
+        {
+                pDialog=  Tools.showProgressBar(context);
+
+                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(String response)
+                        {
+                                try
+                                {
+                                        pDialog.dismiss();
+                                        Log.i("rajat", " onResponseActive " + response);
+                                        JSONParser.UpdateProductNameApiJsonParser(response, context);
+
+
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+                                pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+                        @Override
+                        public String getBodyContentType() {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+                                params.put("id",productId);
+                                params.put("description",description);
+                                return params;
+                        }
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
         public static void changeProductDiscountCall(String url, final Context context,final String productId,final int discount,final int Number)
         {
                 pDialog=  Tools.showProgressBar(context);
@@ -449,10 +832,11 @@ public class CallVolley {
                         {
                                 try
                                 {
+                                        pDialog.dismiss();
                                         Log.i("rajat", " onResponseActive " + response);
                                         JSONParser.ChangeProductDiscountApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -485,8 +869,8 @@ public class CallVolley {
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
                                 Map<String, String> params = new HashMap<>();
-                                params.put("id",productId);
-                                params.put("discount",discount+"");
+                                params.put("id", productId);
+                                params.put("discount", discount + "");
                                 return params;
                         }
                 };
@@ -497,37 +881,38 @@ public class CallVolley {
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
 
-        public static void placeOrderCall(String url, final Context context,final String customerId,final ArrayList<String> productIds,final ArrayList<Float> quantities,final int Number)
+        public static void placeOrderCall(String url, final Context context,final String customerId,final String customerEmail,final String shopkeeperId,final ArrayList<String> productIds,final ArrayList<Float> quantities,final int Number)
         {
                 pDialog=  Tools.showProgressBar(context);
 
-                StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
-                {
-                        // if a reponse is recieved after sending request
-                        @Override
-                        public void onResponse(String response)
-                        {
-                                try
-                                {
+                JSONObject post= new JSONObject();
+                try{
+                        JSONObject postItem = new JSONObject();
+                        for(int x=0;x<productIds.size();x++){
+                                postItem.put(productIds.get(x), quantities.get(x));
+                        }
+                        post.put("customerId", customerId);
+                        post.put("customerEmail",customerEmail);
+                        post.put("shopKeeperId", shopkeeperId);
+                        post.put("items",postItem);
+
+                }catch (JSONException je){
+                        je.printStackTrace();
+                }
+                JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, post,
+                        new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
                                         Log.i("rajat", " onResponseActive " + response);
-                                        JSONParser.PlaceOrderApiJsonParser(response, context);
 
                                         pDialog.dismiss();
+                                        JSONParser.PlaceOrderApiJsonParser(response, context);
+
                                 }
-                                catch (Exception localException)
-                                {
-                                        Log.i("rajat"," onResponseException "+localException.getMessage());
-                                        localException.printStackTrace();
-                                }
-                        }
-                }
-                        , new Response.ErrorListener()
-                {
-                        //if error occurs
+                        }, new Response.ErrorListener() {
                         @Override
-                        public void onErrorResponse(VolleyError error)
-                        {
-                                Log.i("rajat", "onErrorResponse" + error.toString());
+                        public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
                                 pDialog.dismiss();
                         }
                 }){
@@ -537,31 +922,6 @@ public class CallVolley {
                                 Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
                                 mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
-                        }
-                        @Override
-                        public String getBodyContentType() {
-                                return "application/x-www-form-urlencoded; charset=UTF-8";
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                                Map<String, String> params = new HashMap<>();
-                                JSONArray productIdsArr=new JSONArray();
-                                JSONArray quantitiesArr= new JSONArray();
-                                for(int x=0;x<productIds.size();x++){
-                                        productIdsArr.put(productIds.get(x));
-                                        quantitiesArr.put(quantities.get(x)+"");
-                                }
-                                String[] prods=new String[productIds.size()];
-                                        productIds.toArray(prods);
-                                Float[] quans=new Float[quantities.size()];
-                                quantities.toArray(quans);
-                               // JSONObject pro = new JSONObject(prods);
-                                JSONArray pro = new JSONArray(productIds);
-                                JSONArray quo =new JSONArray(quantities);
-                                params.put("customerId",customerId);
-                                params.put("productIds",pro.toString());
-                                params.put("quantityVals",quo.toString());
-                                return params;
                         }
                 };
 
@@ -584,9 +944,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.ChangeOrderStateApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -646,9 +1007,10 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
+                                        pDialog.dismiss();
                                         JSONParser.FindOrdersApiJsonParser(response, context);
 
-                                        pDialog.dismiss();
+
                                 }
                                 catch (Exception localException)
                                 {
@@ -737,7 +1099,7 @@ public class CallVolley {
                                 }
                                 catch (Exception localException)
                                 {
-                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        Log.i("rajat", " onResponseException " + localException.getMessage());
                                         localException.printStackTrace();
                                 }
                         }
@@ -778,7 +1140,7 @@ public class CallVolley {
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
         }
 
-        public static void findPreferencesCall(String url, final Context context,final String userId,final int Number)
+        public static void getSubscriptionsCall(String url,final Context context, final String deviceId, int num)
         {
                 pDialog=  Tools.showProgressBar(context);
 
@@ -791,8 +1153,84 @@ public class CallVolley {
                                 try
                                 {
                                         Log.i("rajat", " onResponseActive " + response);
-//                                        JSONParser.FindPreferencesApiJsonParser(response, context);
+                                        pDialog.dismiss();
 
+                                        JSONParser.getSubcriptionsApiJsonParser(response, context);
+
+                                }
+                                catch (Exception localException)
+                                {
+                                        Log.i("rajat"," onResponseException "+localException.getMessage());
+                                        localException.printStackTrace();
+                                        Intent intent=new Intent(context, PermissionForm.class);
+                                        context.startActivity(intent);
+                                }
+                        }
+                }
+                        , new Response.ErrorListener()
+                {
+                        //if error occurs
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                                Log.i("rajat", "onErrorResponse" + error.toString());
+
+                                pDialog.dismiss();
+                        }
+                }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                //Log.i("size in getHeader: ",myHeaders.size()+"");
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
+                                return mHeaders;
+                        }
+                        @Override
+                        public String getBodyContentType() {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+
+                                params.put("deviceId",deviceId);
+
+
+                                return params;
+                        }
+                };
+
+                //how many times to try and for how much duration
+                setCustomRetryPolicy(request);
+                //get instance of volleysingleton and add reuest to the queue
+                VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+
+        public static void setSubscriptionsCall(String url, final Context context,final String userId,final ArrayList<String> shopIds,final int Number)
+        {
+                pDialog=  Tools.showProgressBar(context);
+                JSONObject send = new JSONObject();
+                JSONArray shops = new JSONArray();
+                try{
+                        for(int i=0; i<shopIds.size();i++){
+                                shops.put(shopIds.get(i));
+                        }
+                        send.put("id", userId);
+                        send.put("subscribedIDs", shops);
+                }catch (JSONException je ){
+
+                }
+                JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,send, new Response.Listener<JSONObject>()
+                {
+                        // if a reponse is recieved after sending request
+                        @Override
+                        public void onResponse(JSONObject response)
+                        {
+                                try
+                                {
+                                        Log.i("rajat", " onResponseActive " + response);
+//                                        JSONParser.FindPreferencesApiJsonParser(response, context);
+                                        JSONParser.setSubcriptionsApiJsonParser(response, context);
                                         pDialog.dismiss();
                                 }
                                 catch (Exception localException)
@@ -819,24 +1257,104 @@ public class CallVolley {
                                 mHeaders.put("x-access-token", context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));//MainActivity.sharedpreferences.getString("Set-Cookie",""));
                                 return mHeaders;
                         }
-                        @Override
-                        public String getBodyContentType() {
-                                return "application/x-www-form-urlencoded; charset=UTF-8";
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                                Map<String, String> params = new HashMap<>();
-
-                                params.put("userId",userId);
-
-
-                                return params;
-                        }
                 };
 
                 //how many times to try and for how much duration
                 setCustomRetryPolicy(request);
                 //get instance of volleysingleton and add reuest to the queue
                 VolleySingleton.getInstance(context).addToRequestQueue(request);
+        }
+
+        public  static void getBitmapFromUrl(String url,final Context con,final ImageView iv){
+
+
+                ImageRequest request = new ImageRequest(url,
+                        new Response.Listener<Bitmap>() {
+
+                                @Override
+                                public void onResponse(Bitmap bitmap) {
+                                        //mImageView.setImageBitmap(bitmap);
+                                        //iv.setImageBitmap(bitmap);
+                                        //byte[] img;
+
+                                        if(bitmap!=null){
+                                                Bitmap bit2 = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+                                                //ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                                                //bit2.compress(Bitmap.CompressFormat.PNG, 100, bos);
+                                                //img = bos.toByteArray();
+                                                iv.setImageBitmap(bit2);
+
+                                        }else{
+                                                Toast.makeText(con, "Image not found", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                }
+                        }, 0, 0, null,
+                        new Response.ErrorListener() {
+                                public void onErrorResponse(VolleyError error) {
+                                        //Toast.makeText(con,"",Toast.LENGTH_SHORT).show();
+
+                                        //Log.i("rajat", error.getLocalizedMessage());
+                                        //mImageView.setImageResource(R.drawable.image_load_error);
+                                }
+                        }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", con.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));
+                                return mHeaders;
+                        }
+                };
+                // Access the RequestQueue through your singleton class.
+                VolleySingleton.getInstance(con).addToRequestQueue(request);
+
+
+        }
+
+        public  static void getBitmapFromUrlBack(String url,final Context con,final ImageView iv){
+
+
+                ImageRequest request = new ImageRequest(url,
+                        new Response.Listener<Bitmap>() {
+
+                                @Override
+                                public void onResponse(Bitmap bitmap) {
+                                        //mImageView.setImageBitmap(bitmap);
+                                        //iv.setImageBitmap(bitmap);
+                                        //byte[] img;
+
+                                        if(bitmap!=null){
+                                                Bitmap bit2 = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+                                                //ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                                                //bit2.compress(Bitmap.CompressFormat.PNG, 100, bos);
+                                                //img = bos.toByteArray();
+                                                Drawable db= (Drawable)new BitmapDrawable(con.getResources(),bit2);
+                                                iv.setBackground(db);
+
+                                        }else{
+                                                Toast.makeText(con, "Image not found", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                }
+                        }, 0, 0, null,
+                        new Response.ErrorListener() {
+                                public void onErrorResponse(VolleyError error) {
+                                        //Toast.makeText(con,"",Toast.LENGTH_SHORT).show();
+
+                                        //Log.i("rajat", error.getLocalizedMessage());
+                                        //mImageView.setImageResource(R.drawable.image_load_error);
+                                }
+                        }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                Map<String, String> mHeaders=new HashMap<String,String>();//myHeaders;
+                                mHeaders.put("x-access-token", con.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", ""));
+                                return mHeaders;
+                        }
+                };
+                // Access the RequestQueue through your singleton class.
+                VolleySingleton.getInstance(con).addToRequestQueue(request);
+
+
         }
 }

@@ -15,7 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.OrderObject;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
@@ -31,17 +33,32 @@ public class Orders extends ActionBarActivity {
     String usertype="Customer";
     ArrayList<OrderObject> orderObjList;
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
-
+//    public static ArrayList<TextView> a;
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
-
+   // public static TextView a;
+    public ArrayList<String> number;
+    public ArrayList<String> address;
+    public static ArrayList<TextView> as;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
+        as=new ArrayList<TextView>();
+
+
         ActionBar actionBar;
         orderObjList=(ArrayList<OrderObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
                 new TypeToken<ArrayList<OrderObject>>() {
                 }.getType());
+        number =(ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("userPhone"),
+                new TypeToken<ArrayList<String>>() {
+                }.getType());
+        address =(ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("userAddress"),
+                new TypeToken<ArrayList<String>>() {
+                }.getType());
+        for (int i=0;i<orderObjList.size();i++){
+            as.add(new TextView(this));
+        }
         Log.d("ffdgdgf", getIntent().getStringExtra("data"));
         actionBar = getSupportActionBar();
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
@@ -50,7 +67,8 @@ public class Orders extends ActionBarActivity {
         ListView listView=(ListView)findViewById(R.id.orders);
         String[] items={"Delievery","Delivery"};
         String[] discounts={"1st Priority","2nd priority"};
-        OrderListAdapter adapter=new OrderListAdapter(orderObjList,this);
+        Log.i("rajat","size:-"+orderObjList.size()+" "+number.size()+" "+address.size());
+        OrderListAdapter adapter=new OrderListAdapter(orderObjList,number,address,this);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -58,7 +76,6 @@ public class Orders extends ActionBarActivity {
                 //add you code for networking here
             }
         });
-
 
         mRecyclerView = (ListView) findViewById(R.id.orders_nav); // Assigning the RecyclerView Object to the xml View
         mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -79,29 +96,47 @@ public class Orders extends ActionBarActivity {
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        Orders.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Orders.this, Login.class);
+                        Intent intent = new Intent(Orders.this, CreateDiscount.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         Orders.this.startActivity(intent);
                     } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Orders.this);
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), Orders.this);
                     }
                 }
                 else if(position==4){
-                    Orders.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(Orders.this, Login.class);
+                    Intent intent = new Intent(Orders.this, NotificationView.class);
                     Orders.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), Orders.this);
+                    }else{
+                        VolleyClick.findOffersClick(Orders.this);
+                    }
+
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),Orders.this);
                 }
             }
         });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Orders");
-        list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
+        list.add("Orders");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 
@@ -116,7 +151,6 @@ public class Orders extends ActionBarActivity {
 //        mLayoutManager = new LinearLayoutManager(this);                 // Creating a layout Manager
 //
 //        mRecyclerView.setLayoutManager(mLayoutManager);                 // Setting the layout Manager
-
 
         Drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);        // Drawer object Assigned to the view
         mDrawerToggle = new ActionBarDrawerToggle(this,Drawer,R.string.openDrawer,R.string.closeDrawer){
@@ -135,8 +169,6 @@ public class Orders extends ActionBarActivity {
                 invalidateOptionsMenu();
                 // Code here will execute once drawer is closed
             }
-
-
 
         }; // Drawer Toggle Object Made
         Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
@@ -159,7 +191,6 @@ public class Orders extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;

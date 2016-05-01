@@ -1,23 +1,44 @@
 package com.rajat.e_subzi;
 
+import android.support.v7.app.ActionBar;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
+import android.text.Layout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rajat.e_subzi.gcm.QuickstartPreferences;
+import com.rajat.e_subzi.gcm.RegistrationIntentService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,55 +69,60 @@ public class Products extends ActionBarActivity{
     String productId = "";
     String message = "";
     ArrayList<ProductObject> productObjects;
+    ArrayList<String> photoUrls;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static Context context;
+    public static LinearLayout lay;
+
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products);
-
+        lay = (LinearLayout)findViewById(R.id.layout_root);
+        context=Products.this;
         Log.d("sdasdsa ",getIntent().getStringExtra("data"));
-        Intent intent=getIntent();
+        ActionBar actionBar;
+        //Intent intent=getIntent();
         productObjects=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
                 new TypeToken<ArrayList<ProductObject>>() {
                 }.getType());
-
-//        try {
-//            JSONObject resultJson = new JSONObject(result);
-//            if (resultJson.has("products")) {
-//                products = resultJson.getJSONArray("products");
-//                for (int i = 0; i < products.length(); i++) {
-//                    product = products.getJSONObject(i);
-//                    discount = product.getInt("discount");
-//                    quantity = product.getInt("quantity");
-//                    if (product.has("price")) {
-//                        price = product.getInt("price");
-//                    }
-//                    userId = product.getString("userId");
-//                    description = product.getString("description");
-//                    productId = product.getString("_id");
-//                    created_at = product.getString("created_at");
-//                    updated_at = product.getString("updated_at");
-//                    productObjList.add(new ProductObject(created_at, updated_at, userId, discount, description, quantity, price, productId));
-//                }
-//            }
-//        }
-//        catch(JSONException e){
-//
-//        }
+        photoUrls = (ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("photoUrl"),
+                new TypeToken<ArrayList<String>>() {
+                }.getType());
+        actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
+        actionBar.setBackgroundDrawable(colorDrawable);
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    //mInformationTextView.setText(getString(R.string.gcm_send_message));
+                    Log.i("rajat",getString(R.string.gcm_send_message));
+                } else {
+                    Log.i("rajat",getString(R.string.token_error_message));
+                    //mInformationTextView.setText(getString(R.string.token_error_message));
+                }
+            }
+        };
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
         gridView=(GridView) findViewById(R.id.product_grid);
 
-        productsGridAdapter=new ProductsGridAdapter(this,count,productObjects);
+        productsGridAdapter=new ProductsGridAdapter(this,count,productObjects,photoUrls);
         gridView.setAdapter(productsGridAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //you code for netwirking here
-//                Intent intent=new Intent(Products.this,ProductDetails.class);
-//                intent.putExtra("desc",productObjList.get(position).getDescription());
-//                intent.putExtra("discount",productObjList.get(position).getDiscount());
-//                intent.putExtra("price",productObjList.get(position).getPrice());
-//                intent.putExtra("quantity",productObjList.get(position).getQuantity());
-//                intent.putExtra("product_id",productObjList.get(position).getProductId());
-//                startActivity(intent);
+
             }
         });
 
@@ -121,29 +147,45 @@ public class Products extends ActionBarActivity{
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Products.this, Login.class);
+                        Intent intent = new Intent(Products.this, CreateDiscount.class);
                         Products.this.startActivity(intent);
                     } else {
-                        VolleyClick.findPreferencesClick(pref.getString("userId",""), Products.this);
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), Products.this);
                     }
                 }
                 else if(position==4){
-                    Products.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                    Intent intent = new Intent(Products.this, Login.class);
+                    Intent intent = new Intent(Products.this, NotificationView.class);
                     Products.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), Products.this);
+                    }else{
+                        VolleyClick.findOffersClick(Products.this);
+                    }
+
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),Products.this);
                 }
             }
         });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Products");
-        list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
+        list.add("Orders");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
         NavListAdapter mAdapter = new NavListAdapter(this,list,pref.getString("userId",""),pref.getString("type",""));       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
@@ -215,34 +257,33 @@ public class Products extends ActionBarActivity{
         Intent intent = new Intent(this, AddProducts.class);
         startActivity(intent);
     }
-//    public void onItemClick(AdapterView<?> parent, View view, int position,
-//                               long id) {
-//        Log.d("fdfs","dfsfdsfgsfs");
-//        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-//        if(position==0){
-//            if (pref.getString("type","").equals("Shopkeeper")) {
-//                VolleyClick.findProductsClick(pref.getString("userId",""), Products.this);
-//            } else {
-//                VolleyClick.findDiscountsClick(pref.getString("userId",""), Products.this);
-//            }
-//        }
-//        else if(position==1){
-//            VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Products.this);
-//        }
-//        else if(position==2){
-//            if (pref.getString("type", "").equals("Shopkeeper")) {
-//                this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-//                Intent intent = new Intent(Products.this, Login.class);
-//                Products.this.startActivity(intent);
-//            } else {
-//                VolleyClick.findPreferencesClick(pref.getString("userId",""), Products.this);
-//            }
-//        }
-//        else if(position==3){
-//            this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-//            Intent intent = new Intent(Products.this, Login.class);
-//            Products.this.startActivity(intent);
-//        }
-//    }
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i("Shops", "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+    }
+
 
 }

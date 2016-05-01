@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.5"
         android:layout_marginTop="6dp"
-        android:background="#4D4FBC">
+        android:background="@color/white">
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -21,8 +21,10 @@
                 android:layout_height="wrap_content"
                 android:text="Carrots"
                 android:textAlignment="center"
+                android:textColor="#b40a98"
                 android:textSize="30dp"
-                android:layout_centerVertical="true"
+
+                android:layout_below="@id/product_image"
 
                 android:id="@+id/product_text"
                 android:gravity="center_horizontal" />
@@ -44,8 +46,9 @@
         <ImageButton
             android:layout_width="53dp"
             android:layout_height="53dp"
-            android:src="@drawable/ic_turned_in_black_24dp"
-            android:scaleType="fitXY" />
+            android:src="@drawable/red_cross_tick"
+            android:scaleType="fitXY"
+            android:id="@+id/delete_product"/>
 
     </LinearLayout>
 </LinearLayout>

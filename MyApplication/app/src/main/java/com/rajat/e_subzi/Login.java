@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rajat.e_subzi.Volley.VolleyClick;
 
@@ -60,9 +62,15 @@ public class Login extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
     public void login(View view){
-        TextView user=(TextView) findViewById(R.id.username);
-        TextView pass=(TextView) findViewById(R.id.password);
+        EditText user=(EditText) findViewById(R.id.username);
+        EditText pass=(EditText) findViewById(R.id.password);
+        String userName =user.getText().toString();
+        String password = pass.getText().toString();
+        if(!userName.equals("") && !password.equals("") ) {
         VolleyClick.loginClick(user.getText().toString(), pass.getText().toString(),this);
+        }else{
+            Toast.makeText(Login.this, "Some fields are empty", Toast.LENGTH_SHORT).show();
+        }
     }
     public void signup(View view){
         Intent intent=new Intent(this,SignUp.class);

@@ -12,8 +12,9 @@ public class ProductObject {
     int quantity= 0;
     int price= 0;
     String productId= "";
+    String userEmail="";
 
-    public ProductObject(String created_at, String updated_at, String userId, int discount, String description, int quantity, int price, String productId) {
+    public ProductObject(String created_at, String updated_at, String userId, int discount, String description, int quantity, int price, String productId, String userEmail) {
         this.created_at = created_at;
         this.updated_at = updated_at;
         this.userId = userId;
@@ -22,6 +23,7 @@ public class ProductObject {
         this.quantity = quantity;
         this.price = price;
         this.productId = productId;
+        this.userEmail = userEmail;
     }
 
     public String getCreated_at() {
@@ -86,5 +88,13 @@ public class ProductObject {
 
     public void setProductId(String productId) {
         this.productId = productId;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

@@ -44,6 +44,25 @@
         android:id="@+id/password"
         android:paddingLeft="15dp"
         android:inputType="textPassword" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/roundness"
+                android:layout_margin="20dp"
+                android:hint="Address"
+                android:id="@+id/address"
+                android:paddingLeft="15dp"
+                android:inputType="text" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/roundness"
+                android:layout_margin="20dp"
+                android:hint="Contact Number"
+                android:id="@+id/phoneNumber"
+                android:paddingLeft="15dp"
+                android:inputType="number" />
+
     <Spinner
         android:id="@+id/type"
         android:layout_width="181dp"

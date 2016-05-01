@@ -8,8 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rajat.e_subzi.Volley.VolleyClick;
 
@@ -36,6 +38,7 @@ public class SignUp extends ActionBarActivity implements AdapterView.OnItemSelec
                 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter_state);
         spinner.setOnItemSelectedListener(this);
+        spinner.setVisibility(View.GONE);
     }
 
     @Override
@@ -72,9 +75,31 @@ public class SignUp extends ActionBarActivity implements AdapterView.OnItemSelec
 
     }
     public void signup(View view){
-        TextView user=(TextView) findViewById(R.id.username);
-        TextView pass=(TextView) findViewById(R.id.password);
-        VolleyClick.signUp(user.getText().toString(), pass.getText().toString(), spinner.getSelectedItem().toString(),this);
+        EditText user=(EditText) findViewById(R.id.username);
+        EditText pass=(EditText) findViewById(R.id.password);
+        EditText address=(EditText) findViewById(R.id.address);
+        EditText phoneNum=(EditText) findViewById(R.id.phoneNumber);
+        String userName =user.getText().toString();
+        String password = pass.getText().toString();
+        String addressss= address.getText().toString();
+        String phoneNumber =phoneNum.getText().toString();
+        if(!userName.equals("") && !password.equals("") && !addressss.equals("") && !phoneNumber.equals("")) {
+            if (userName.length() > 5 && password.length() > 7 && addressss.length()>7 && phoneNumber.length()>6) {
+            VolleyClick.signUp(user.getText().toString(), pass.getText().toString(), address.getText().toString(), phoneNum.getText().toString(), "Customer", this);
+            }else{
+                if(userName.length()<=5){
+                    Toast.makeText(SignUp.this,"Username should have atleast 5 characters",Toast.LENGTH_SHORT).show();
+                }else if(password.length()<=7){
+                    Toast.makeText(SignUp.this,"Password should have atleast 7 characters",Toast.LENGTH_SHORT).show();
+                }else if(addressss.length()<=7){
+                    Toast.makeText(SignUp.this,"Address should have atleast 7 characters",Toast.LENGTH_SHORT).show();
+                }else if(phoneNumber.length()<=6){
+                    Toast.makeText(SignUp.this,"Phone number should have atleast 6 characters",Toast.LENGTH_SHORT).show();
+                }
+            }
 
+        }else{
+            Toast.makeText(SignUp.this,"Some fields are empty",Toast.LENGTH_SHORT).show();
+        }
     }
 }

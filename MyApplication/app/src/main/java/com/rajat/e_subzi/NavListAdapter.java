@@ -54,20 +54,23 @@ public class NavListAdapter extends BaseAdapter{
         ImageView i=(ImageView) row.findViewById(R.id.txt_lft);
         if(position==0){
             i.setImageResource(R.drawable.ic_add_shopping_cart_black_24dp);
-
         }
         else if(position==1){
             i.setImageResource(R.drawable.ic_shopping_cart_black_24dp);
         }
         else if(position==2){
-            if(list.size()==4){
                 i.setImageResource(R.drawable.ic_subject_black_24dp);
-            }
-            else {
-                i.setImageResource(R.drawable.ic_power_settings_new_black_24dp);
-            }
         }
         else  if(position==3){
+            i.setImageResource(R.drawable.ic_turned_in_black_24dp);
+        }
+        else if (position==4){
+            if(list.size()==5){
+            i.setImageResource(R.drawable.ic_power_settings_new_black_24dp);
+            }else{
+                i.setImageResource(R.drawable.ic_share_black_24dp);
+            }
+        }else if (position==5){
             i.setImageResource(R.drawable.ic_power_settings_new_black_24dp);
         }
 //        data.setOnClickListener(new View.OnClickListener() {

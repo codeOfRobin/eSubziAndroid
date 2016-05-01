@@ -1,14 +1,20 @@
 package com.rajat.e_subzi;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -20,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -31,7 +38,8 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.rajat.e_subzi.Tools.MultipartRequest;
+
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Volley.VolleyClick;
 
 import org.json.JSONException;
@@ -49,6 +57,8 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
 
+
+
 public class AddProducts extends ActionBarActivity implements AdapterView.OnItemSelectedListener {
     private String[] dropDown={"Quantity(in kgs):","1","2","3","4","5","6","7","8","9","10","11","12","13","14"};
     Spinner spinner;
@@ -57,7 +67,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-    private ImageView imgPreview;
+    private ImageView imgPreview ;
     private static final String IMAGE_DIRECTORY_NAME = "Products";
     private Uri fileUri;
     ListView mRecyclerView;
@@ -65,18 +75,53 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
-
+    CheckBox chk;
     private static File file;
+
+    private static final int REQUEST_STORAGE = 0;
+
+    private static final int REQUEST_CONTACTS = 1;
+    private static String[] PERMISSIONS_File = {Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+public void reqCamPer(){
+    ActivityCompat
+            .requestPermissions(AddProducts.this, PERMISSIONS_File,
+                    REQUEST_STORAGE);
+}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= 23) {
+            // Marshmallow+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    Log.i("rajat","hello hello");
+                    // Show an expanation to the user *asynchronously* -rajat- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                } else {
+                    reqCamPer();
+                }
+
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_products);
+
+
         ActionBar actionBar;
         pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         actionBar = getSupportActionBar();
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
         actionBar.setBackgroundDrawable(colorDrawable);
-
+imgPreview =new ImageView(AddProducts.this);
         spinner=(Spinner)findViewById(R.id.spinner1);
         ArrayAdapter<String> adapter_state = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, dropDown);
@@ -84,18 +129,67 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
                 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter_state);
         spinner.setOnItemSelectedListener(this);
-
+        chk = (CheckBox)findViewById(R.id.deliveryAvailable);
+        chk.setChecked(true);
         mRecyclerView = (ListView) findViewById(R.id.add_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
+                Log.d("sheck",pref.getString("type",""));
+                Log.d("check",""+position);
+                if(position==1){
+                    if (pref.getString("type","").equals("Shopkeeper")) {
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), AddProducts.this);
+                    } else {
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), AddProducts.this);
+                    }
+                }
+                else if(position==2){
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), AddProducts.this);
+                }
+                else if(position==3){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        Intent intent = new Intent(AddProducts.this, CreateDiscount.class);
+                        AddProducts.this.startActivity(intent);
+                    } else {
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), AddProducts.this);
+                    }
+                }
+                else if(position==4){
+                    Intent intent = new Intent(AddProducts.this, NotificationView.class);
+                    AddProducts.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), AddProducts.this);
+                    }else{
+                        VolleyClick.findOffersClick(AddProducts.this);
+                    }
+
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),AddProducts.this);
+                }
+            }
+        });
 
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Products");
-        list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
+        list.add("Orders");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 
@@ -138,6 +232,8 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+
     }
 
     @Override
@@ -177,8 +273,9 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
     }
     public void captureImage(View view){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        Uri fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        fileUri= Uri.parse("http://www.google.com");
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        System.out.println(fileUri);
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
@@ -192,7 +289,10 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
             if (resultCode == RESULT_OK) {
                 // successfully captured the image
                 // display it in image view
-                previewCapturedImage();
+
+//                fileUri=data.getData();
+//Log.d("rajatcam",""+fileUri);
+//                previewCapturedImage();
             } else if (resultCode == RESULT_CANCELED) {
                 // user cancelled Image capture
                 Toast.makeText(getApplicationContext(),
@@ -206,28 +306,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
             }
         }
     }
-    private void previewCapturedImage() {
-        try {
-            // hide video preview
 
-
-            imgPreview.setVisibility(View.VISIBLE);
-
-            // bimatp factory
-            BitmapFactory.Options options = new BitmapFactory.Options();
-
-            // downsizing image as it throws OutOfMemory Exception for larger
-            // images
-            options.inSampleSize = 8;
-
-            final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
-                    options);
-
-            imgPreview.setImageBitmap(bitmap);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
     public Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
@@ -262,32 +341,14 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
             return null;
         }
         file=mediaFile;
+        if(file!=null){
+            Log.i("rajat","not null");
+        }
         return mediaFile;
     }
 
 
     public void addProduct(View view){
-
-        Map<String,String> params=new HashMap<String, String>();
-        params.put("ShopkeeperId",pref.getString("userId",""));
-        Response.Listener<String> mListener=new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d("rishab","sdasda");
-            }
-        };
-        MultipartRequest.MultipartProgressListener listener=new MultipartRequest.MultipartProgressListener() {
-            @Override
-            public void transferred(long transfered, int progress) {
-                Log.d("rishab prog",""+transfered+"  "+progress);
-            }
-        };
-        Response.ErrorListener err=new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("err",error.toString());
-            }
-        };
 
         EditText editText=(EditText)findViewById(R.id.item_name);
         String name=(String)editText.getText().toString();
@@ -297,12 +358,58 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
         String discount=(String)editText.getText().toString();
         Spinner spinner=(Spinner) findViewById(R.id.spinner1);
         String amount=spinner.getSelectedItem().toString();
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId","0"), Integer.parseInt(discount),this,file,params,mListener,err,listener);
-
+        CheckBox chked = (CheckBox)findViewById(R.id.deliveryAvailable);
+        Boolean deliveryAvailable =chked.isChecked();
+        //String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        if(file!=null){
+            Log.i("rajat","not null2");
+        }
+        if(!name.equals("")&&!price.equals("")&& !amount.equals("Quantity(in kgs):")&& !discount.equals("")){
+            VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId", "0"), pref.getString("email", "0"), Integer.parseInt(discount),deliveryAvailable, this, file);
+        }else if(name.equals("")){
+            Toast.makeText(this,"Provide the product name",Toast.LENGTH_SHORT).show();
+        }else if(price.equals("")) {
+            Toast.makeText(this,"Enter the price of product",Toast.LENGTH_SHORT).show();
+        }else if(discount.equals("")){
+            Toast.makeText(this,"Enter the discount on product",Toast.LENGTH_SHORT).show();
+        }else if(amount.equals("Quantity(in kgs):")){
+            Toast.makeText(this,"Enter the quantity of product",Toast.LENGTH_SHORT).show();
+        }
+//        @Multipart
+//        @PUT("user/photo")
+//        Call<User> updateUser(@Part("photo") RequestBody photo, @Part("description") RequestBody description);
         //add the networking code here
     }
-    public void canncel(View view){
+
+    public void cancel(View view){
         this.finish();
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_STORAGE) {
+            // BEGIN_INCLUDE(permission_result)
+            // Received permission result for camera permission.
+            Log.i("rajat", "Received response for Camera permission request.");
+
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Camera permission has been granted, preview can be displayed
+                Log.i("rajat", "READ permission has now been granted. Showing preview.");
+
+            } else {
+                Log.i("rajat", "READ permission was NOT granted.");
+
+
+            }
+            // END_INCLUDE(permission_result)
+
+        }  else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
 }

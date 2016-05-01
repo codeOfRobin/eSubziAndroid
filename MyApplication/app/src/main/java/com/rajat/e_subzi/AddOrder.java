@@ -1,7 +1,11 @@
 package com.rajat.e_subzi;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,7 +17,9 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
 import com.google.gson.Gson;
@@ -27,38 +33,97 @@ import java.util.Map;
 
 public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSelectedListener{
     ArrayList<ProductObject> productObjList;
+    ArrayList<Boolean>delivery ;
     ArrayList<String> productIds;
     ArrayList<Float> quantities;
     ListView mRecyclerView;
+
+    public static HashMap<String, Float> data_quantity=new HashMap<String,Float>();
 
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
 
     public static HashMap<String,Float> data=new HashMap<String ,Float>();
-    ArrayList<ProductObject> productObjects;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_order);
         productIds=new ArrayList<String>();
         quantities=new ArrayList<Float>();
+        ActionBar actionBar;
+        actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
+        actionBar.setBackgroundDrawable(colorDrawable);
         productObjList=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
                 new TypeToken<ArrayList<ProductObject>>() {
+                }.getType());
+        delivery=(ArrayList<Boolean>) new Gson().fromJson(getIntent().getStringExtra("delivery"),
+                new TypeToken<ArrayList<Boolean>>() {
                 }.getType());
         Log.d("size",""+productObjList.size());
 
         mRecyclerView = (ListView) findViewById(R.id.order_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
+                Log.d("sheck", pref.getString("type", ""));
+                Log.d("check",""+position);
+                if(position==1){
+                    if (pref.getString("type","").equals("Shopkeeper")) {
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), AddOrder.this);
+                    } else {
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), AddOrder.this);
+                    }
+                }
+                else if(position==2){
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), AddOrder.this);
+                }
+                else if(position==3){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        Intent intent = new Intent(AddOrder.this, CreateDiscount.class);
+                        AddOrder.this.startActivity(intent);
+                    } else {
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), AddOrder.this);
+                    }
+                }
+                else if(position==4){
+                    Intent intent = new Intent(AddOrder.this, NotificationView.class);
+                    AddOrder.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), AddOrder.this);
+                    }else{
+                        VolleyClick.findOffersClick(AddOrder.this);
+                    }
+
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),AddOrder.this);
+                }
+
+            }
+        });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
-        list.add("Discounts/Products");
-        list.add("Order");
         if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Products");
+        }else{
+            list.add("Shops");
+        }
+        list.add("Orders");
+        if(pref.getString("type","").equals("Shopkeeper")){
+            list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 
@@ -103,7 +168,7 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
         getSupportActionBar().setHomeButtonEnabled(true);
 
         ListView listView=(ListView) findViewById(R.id.place_order_list);
-        AddOrderAdapter adapter=new AddOrderAdapter(productObjList,this);
+        AddOrderAdapter adapter=new AddOrderAdapter(productObjList,delivery,this);
         listView.setAdapter(adapter);
 //        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
@@ -157,14 +222,20 @@ public class AddOrder extends ActionBarActivity  implements AdapterView.OnItemSe
         Iterator it = data.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
+            if(!pair.getValue().equals(0)){
             productIds.add(pair.getKey().toString());
             quantities.add((Float)pair.getValue());
+            }
             System.out.println(pair.getKey() + " = " + pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         Log.d("rajar",Integer.toString(productIds.size()));
-        VolleyClick.placeOrderClick(pref.getString("userId"," "), productIds, quantities,this);
+        if(quantities.size()>0) {
+            VolleyClick.placeOrderClick(pref.getString("userId", " "), pref.getString("email", " "), productObjList.get(0).getUserId(), productIds, quantities, this);
+        }else{
+            Toast.makeText(this,"All quantities are 0",Toast.LENGTH_SHORT).show();
+        }
     }
     public void onItemSelected(AdapterView<?> parent, View view, int position,
                                long id) {
