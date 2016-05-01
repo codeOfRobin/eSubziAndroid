@@ -3,8 +3,11 @@ package com.rajat.e_subzi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.telecom.Call;
@@ -19,12 +22,17 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.CallVolley;
 import com.rajat.e_subzi.Volley.VolleyClick;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -35,19 +43,35 @@ public class CreateDiscount extends ActionBarActivity{
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;
-EditText descrition;
+    EditText descrition;
     Button send;
     //ArrayList<String>photoUrls = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_discount);
+
+        ActionBar actionBar;
+        actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
+        actionBar.setBackgroundDrawable(colorDrawable);
         descrition =(EditText) findViewById(R.id.desc_discount);
+
         send= (Button)findViewById(R.id.send_discount);
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String discount= descrition.getText().toString();
+                String format="yyyy-MM-dd HH:mm";
+                SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+                Date date = new Date();
+                Calendar cal = Calendar.getInstance(); // creates calendar
+                cal.setTime(date); // sets calendar time/date=====> you can set your own date here
+//                cal.add(Calendar.HOUR_OF_DAY, 5); // adds one hour
+//                cal.add(Calendar.MINUTE, 30); // adds one Minute
+//                date=cal.getTime();
+                String datetime = sdf.format(date);
+                String discount= getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("email","")+" :\n"
+                        +descrition.getText().toString()+ "\n"+datetime;
                 VolleyClick.createDiscountClick(getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("userId",""),discount,CreateDiscount.this);
             }
         });
@@ -79,10 +103,18 @@ EditText descrition;
                     }
                 }
                 else if(position==4){
+                    Intent intent = new Intent(CreateDiscount.this, NotificationView.class);
+                    CreateDiscount.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), CreateDiscount.this);
+                    }else{
+                        VolleyClick.findOffersClick(CreateDiscount.this);
+                    }
 
-
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),CreateDiscount.this);
-
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),CreateDiscount.this);
                 }
             }
         });
@@ -93,13 +125,16 @@ EditText descrition;
         }else{
             list.add("Shops");
         }
-        list.add("Order");
+        list.add("Orders");
         if(pref.getString("type","").equals("Shopkeeper")){
             list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 

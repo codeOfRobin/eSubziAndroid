@@ -1,10 +1,13 @@
 package com.rajat.e_subzi;
 
+import android.support.v7.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -29,6 +32,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
 import com.google.gson.Gson;
@@ -78,6 +82,7 @@ public class Products extends ActionBarActivity{
         lay = (LinearLayout)findViewById(R.id.layout_root);
         context=Products.this;
         Log.d("sdasdsa ",getIntent().getStringExtra("data"));
+        ActionBar actionBar;
         //Intent intent=getIntent();
         productObjects=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
                 new TypeToken<ArrayList<ProductObject>>() {
@@ -85,6 +90,9 @@ public class Products extends ActionBarActivity{
         photoUrls = (ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("photoUrl"),
                 new TypeToken<ArrayList<String>>() {
                 }.getType());
+        actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
+        actionBar.setBackgroundDrawable(colorDrawable);
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -146,10 +154,18 @@ public class Products extends ActionBarActivity{
                     }
                 }
                 else if(position==4){
+                    Intent intent = new Intent(Products.this, NotificationView.class);
+                    Products.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), Products.this);
+                    }else{
+                        VolleyClick.findOffersClick(Products.this);
+                    }
 
-
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),Products.this);
-
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),Products.this);
                 }
             }
         });
@@ -160,13 +176,16 @@ public class Products extends ActionBarActivity{
         }else{
             list.add("Shops");
         }
-        list.add("Order");
+        list.add("Orders");
         if(pref.getString("type","").equals("Shopkeeper")){
             list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
         NavListAdapter mAdapter = new NavListAdapter(this,list,pref.getString("userId",""),pref.getString("type",""));       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)

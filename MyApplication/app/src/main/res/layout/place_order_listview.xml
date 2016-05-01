@@ -11,7 +11,8 @@
         android:id="@+id/card_view"
         android:layout_gravity="center_vertical"
         android:layout_width="fill_parent"
-        android:layout_height="130dp"
+        android:minHeight="150dp"
+        android:layout_height="wrap_content"
         android:layout_margin="5dp"
         card_view:cardCornerRadius="2dp"
         card_view:contentPadding="10dp"
@@ -40,6 +41,16 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/discount"
                 android:textSize="15dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/quantity"
+                android:textSize="15dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/deliverable"
+                android:textSize="15dp" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -50,7 +61,7 @@
                     android:layout_height="40dp"
                     android:id="@+id/dec"
                     android:text="-"
-                    style="@drawable/cle" />
+                    style="@drawable/cle"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -68,7 +79,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#9f7a7a7b"
-
                 android:layout_marginRight="10dp" />
 
         </LinearLayout>

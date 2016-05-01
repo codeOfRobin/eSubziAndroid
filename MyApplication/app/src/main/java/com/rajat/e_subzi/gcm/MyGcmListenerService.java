@@ -18,6 +18,7 @@ package com.rajat.e_subzi.gcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.support.v4.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
@@ -25,10 +26,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Login;
+import com.rajat.e_subzi.Objects.NotificationObject;
 import com.rajat.e_subzi.R;
 import com.google.android.gms.gcm.GcmListenerService;
+import com.rajat.e_subzi.db.DatabaseHandler;
 
 public class MyGcmListenerService extends GcmListenerService {
 
@@ -67,6 +72,10 @@ public class MyGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
+        NotificationObject notificationObject=new NotificationObject(message,0);
+        DatabaseHandler databaseH = new DatabaseHandler(getApplicationContext());
+        databaseH.create(notificationObject);
+
         sendNotification(message);
         // [END_EXCLUDE]
     }
@@ -79,19 +88,43 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     int id=0;
     private void sendNotification(String message) {
-        Intent intent = new Intent(this, Login.class);
+        Intent intent = new Intent(this, NotificationView.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        //////////////////////////
+//        NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
+//        bigText.bigText(message);
+//        bigText.setBigContentTitle("eSubzi");
+
+
+        //bigText.setSummaryText("By: Dhaval Sodha Parmar");
+
+//        RemoteViews remoteViews = new RemoteViews(getPackageName(),
+//                R.layout.custom_notification);
+//        Intent resultIntent = new Intent(this, Login.class);
+//        // The stack builder object will contain an artificial back stack for
+//        // the
+//        // started Activity.
+//        // This ensures that navigating backward from the Activity leads out of
+//        // your application to the Home screen.
+//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+//        // Adds the back stack for the Intent (but not the Intent itself)
+//        stackBuilder.addParentStack(Login.class);
+//        // Adds the Intent that starts the Activity to the top of the stack
+//        stackBuilder.addNextIntent(resultIntent);
+        ///////////////////////
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_ic_notification)
+                .setSmallIcon(R.drawable.bag)
                 .setContentTitle("eSubzi")
                 .setContentText(message)
+                //.setContent()
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
+        //notificationBuilder.setStyle(bigText);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

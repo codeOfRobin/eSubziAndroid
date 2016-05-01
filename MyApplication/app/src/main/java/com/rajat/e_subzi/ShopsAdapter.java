@@ -22,12 +22,13 @@ public class ShopsAdapter extends BaseAdapter {
     ArrayList<String > shops;
     Context context;
     HashMap<String ,ArrayList<String>>photoUrl;
-
-    public ShopsAdapter(ArrayList<String> shops,HashMap<String ,ArrayList<String>>photoUrl,Context context){
+    HashMap<String ,ArrayList<Boolean>>deliverable;
+    public ShopsAdapter(ArrayList<String> shops,HashMap<String ,ArrayList<String>>photoUrl,HashMap<String ,ArrayList<Boolean>>deliverable,Context context){
         super();
         this.shops=shops;
         this.context=context;
         this.photoUrl=photoUrl;
+        this.deliverable=deliverable;
 
     }
 
@@ -55,15 +56,18 @@ public class ShopsAdapter extends BaseAdapter {
             public void onClick(View view) {
                 ArrayList<String> photoUrls = new ArrayList<String>();
                 photoUrls=photoUrl.get(shops.get(position));
+                ArrayList<Boolean>delivery =new ArrayList<Boolean>();
+                delivery=deliverable.get(shops.get(position));
                 Intent intent=new Intent(context,Discounts.class);
                 intent.putExtra("data", new Gson().toJson(Shops.shop_discount_details.get(shops.get(position))));
-
+                intent.putExtra("delivery", new Gson().toJson(delivery));
                 intent.putExtra("photoUrl", new Gson().toJson(photoUrls));
                         context.startActivity(intent);
             }
         });
         TextView t=(TextView) row.findViewById(R.id.shp);
         t.setText(shops.get(position));
+        t.setAllCaps(true);
 
         return row;
     }

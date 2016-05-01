@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.OrderObject;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
@@ -66,7 +67,7 @@ public class Orders extends ActionBarActivity {
         ListView listView=(ListView)findViewById(R.id.orders);
         String[] items={"Delievery","Delivery"};
         String[] discounts={"1st Priority","2nd priority"};
-        Log.i("rajat","size:-"+orderObjList.size());
+        Log.i("rajat","size:-"+orderObjList.size()+" "+number.size()+" "+address.size());
         OrderListAdapter adapter=new OrderListAdapter(orderObjList,number,address,this);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -96,13 +97,26 @@ public class Orders extends ActionBarActivity {
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
                         Intent intent = new Intent(Orders.this, CreateDiscount.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         Orders.this.startActivity(intent);
                     } else {
                         VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), Orders.this);
                     }
                 }
                 else if(position==4){
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),Orders.this);
+                    Intent intent = new Intent(Orders.this, NotificationView.class);
+                    Orders.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), Orders.this);
+                    }else{
+                        VolleyClick.findOffersClick(Orders.this);
+                    }
+
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),Orders.this);
                 }
             }
         });
@@ -113,13 +127,16 @@ public class Orders extends ActionBarActivity {
         }else{
             list.add("Shops");
         }
-        list.add("Order");
+        list.add("Orders");
         if(pref.getString("type","").equals("Shopkeeper")){
             list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 

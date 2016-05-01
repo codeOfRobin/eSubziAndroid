@@ -14,7 +14,7 @@
 
 
     <string name="title_activity_add_products">AddProducts</string>
-    <string name="title_activity_discounts">Discounts</string>
+    <string name="title_activity_discounts">Products</string>
     <string name="title_activity_orders">Orders</string>
     <string name="discounts">Discounts</string>
     <string name="products">Products</string>
@@ -34,8 +34,9 @@
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_add_order">AddOrder</string>
     <string name="title_activity_permission_form">PermissionForm</string>
-    <string name="title_activity_order_deatils">OrderDeatils</string>
+    <string name="title_activity_order_deatils">OrderDetails</string>
     <string name="title_activity_shops">Shops</string>
     <string name="title_activity_create_discounts">Create Discount</string>
-
+    <string name="title_activity_create_notifications">Notifications</string>
+    <string name="title_activity_offers">Offers</string>
 </resources>

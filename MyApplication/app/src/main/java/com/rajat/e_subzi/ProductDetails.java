@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
 import com.google.gson.Gson;
@@ -52,19 +53,19 @@ public class ProductDetails extends ActionBarActivity {
                 editText = (EditText) findViewById(R.id.p_discount);
                 discount = editText.getText().toString();
 
-                EditText price =(EditText)findViewById(R.id.p_price);
-                String prices=price.getText().toString();
-                if(!prices.equals("")  && !discount.equals("")){
+                EditText price = (EditText) findViewById(R.id.p_price);
+                String prices = price.getText().toString();
+                if (!prices.equals("") && !discount.equals("")) {
                     int p_discount = Integer.parseInt(discount);
-                    int p_price =Integer.parseInt(price.getText().toString());
-                    if( p_discount < p_price){
+                    int p_price = Integer.parseInt(price.getText().toString());
+                    if (p_discount < p_price) {
                         VolleyClick.changeDiscountClick(product.getProductId(), Integer.parseInt(discount), ProductDetails.this);
-                    }else{
-                        Toast.makeText(ProductDetails.this,"Discount should be less than price",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ProductDetails.this, "Discount should be less than price", Toast.LENGTH_SHORT).show();
                     }
 
-                }else if(prices.equals("") || discount.equals("")){
-                    Toast.makeText(ProductDetails.this,"Provide values for price and discount",Toast.LENGTH_SHORT).show();
+                } else if (prices.equals("") || discount.equals("")) {
+                    Toast.makeText(ProductDetails.this, "Provide values for price and discount", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -84,7 +85,7 @@ public class ProductDetails extends ActionBarActivity {
                     int p_discount = Integer.parseInt(discount);
                     int p_price =Integer.parseInt(price.getText().toString());
                     if( p_discount < p_price){
-                        VolleyClick.updatePriceClick(product.getProductId(), p_price,ProductDetails.this);
+                        VolleyClick.updatePriceClick(product.getProductId(), p_price, ProductDetails.this);
                     }else{
                         Toast.makeText(ProductDetails.this,"Discount should be less than price",Toast.LENGTH_SHORT).show();
                     }
@@ -95,7 +96,47 @@ public class ProductDetails extends ActionBarActivity {
 
             }
         });
+        Button update_quantity =(Button) findViewById(R.id.update_quantity);
+        update_quantity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText editText ;//= (EditText) findViewById(R.id.p_discount);
+                String quantity;
+                editText = (EditText) findViewById(R.id.p_quantity);
+                quantity = editText.getText().toString();
 
+
+
+                if( !quantity.equals("")){
+                    int p_quantity = Integer.parseInt(quantity);
+
+                    if( p_quantity>0){
+                        VolleyClick.updateQuantityClick(product.getProductId(), p_quantity,ProductDetails.this);
+                    }else{
+                        Toast.makeText(ProductDetails.this,"Quantity should be greater than zero",Toast.LENGTH_SHORT).show();
+                    }
+
+                }else if(quantity.equals("") ){
+                    Toast.makeText(ProductDetails.this,"Provide value for quantity",Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        Button update_name =(Button) findViewById(R.id.update_name);
+        update_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText editText ;//= (EditText) findViewById(R.id.p_discount);
+                String name;
+                editText = (EditText) findViewById(R.id.p_desc);
+                name = editText.getText().toString();
+                if( !name.equals("")){
+                        VolleyClick.updateNameClick(product.getProductId(), name,ProductDetails.this);
+                }else if(name.equals("") ){
+                    Toast.makeText(ProductDetails.this,"Name cannot be empty",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         edittext=(EditText)findViewById(R.id.p_price);
         edittext.setText(Integer.toString(product.getPrice()));
         edittext=(EditText)findViewById(R.id.p_quantity);
@@ -127,9 +168,19 @@ public class ProductDetails extends ActionBarActivity {
                     }
                 }
                 else if(position==4){
+                    Intent intent = new Intent(ProductDetails.this, NotificationView.class);
+                    ProductDetails.this.startActivity(intent);
+                }
+                else if(position==5){
 
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),ProductDetails.this);
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), ProductDetails.this);
+                    }else{
+                        VolleyClick.findOffersClick(ProductDetails.this);
+                    }
 
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),ProductDetails.this);
                 }
             }
         });
@@ -140,13 +191,16 @@ public class ProductDetails extends ActionBarActivity {
         }else{
             list.add("Shops");
         }
-        list.add("Order");
+        list.add("Orders");
         if(pref.getString("type","").equals("Shopkeeper")){
             list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 

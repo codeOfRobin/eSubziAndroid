@@ -2,7 +2,10 @@ package com.rajat.e_subzi;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.OrderObject;
 import com.google.gson.Gson;
 import com.rajat.e_subzi.Volley.VolleyClick;
@@ -30,6 +34,10 @@ public class OrderDeatils extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_deatils);
+        ActionBar actionBar;
+        actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
+        actionBar.setBackgroundDrawable(colorDrawable);
         OrderObject order = (OrderObject) new Gson().fromJson(getIntent().getStringExtra("data"),OrderObject.class);
         TextView t=(TextView)findViewById(R.id.shop_name);
         t.setText(order.getCustomerEmail());
@@ -65,10 +73,20 @@ public class OrderDeatils extends ActionBarActivity {
                     }
                 }
                 else if(position==4){
+                    Intent intent = new Intent(OrderDeatils.this, NotificationView.class);
+                    OrderDeatils.this.startActivity(intent);
+                }
+                else if(position==5){
 
 
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),OrderDeatils.this);
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), OrderDeatils.this);
+                    }else{
+                        VolleyClick.findOffersClick(OrderDeatils.this);
+                    }
 
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),OrderDeatils.this);
                 }
             }
         });
@@ -79,13 +97,16 @@ public class OrderDeatils extends ActionBarActivity {
         }else{
             list.add("Shops");
         }
-        list.add("Order");
+        list.add("Orders");
         if(pref.getString("type","").equals("Shopkeeper")){
             list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 

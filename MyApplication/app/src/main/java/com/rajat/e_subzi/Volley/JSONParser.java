@@ -15,11 +15,13 @@ import android.widget.Toast;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Discounts;
 import com.rajat.e_subzi.Objects.ItemObject;
 import com.rajat.e_subzi.Objects.OrderObject;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Objects.ShopObject;
+import com.rajat.e_subzi.Offers;
 import com.rajat.e_subzi.Orders;
 import com.rajat.e_subzi.PermissionForm;
 import com.rajat.e_subzi.Products;
@@ -86,6 +88,7 @@ public class JSONParser {
                 }
             } else if (resultJson.has("error")) {
                 error = resultJson.getString("error");
+                Toast.makeText(con,error,Toast.LENGTH_SHORT).show();
             }
             Log.i("rajat", email + " " + userId + " " + token + " " + type + " " + error);
 //            Tools.showAlertDialog(email + " " + userId + " " + token + " " + type + " " + error, con);
@@ -287,7 +290,8 @@ public class JSONParser {
             Log.i("rajat", discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " size: " + productObjList.size() + " " + message);
 ////            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
             Intent intent=new Intent(con,Products.class);
-
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra("data", (String) new Gson().toJson(productObjList));
             intent.putExtra("photoUrl",(String) new Gson().toJson(photoUrl));
             con.startActivity(intent);
@@ -315,6 +319,9 @@ public class JSONParser {
             String photoUrl="";
             ArrayList<String> photoUrls = new ArrayList<String>();
             HashMap<String,ArrayList<String>> photos=new HashMap<String ,ArrayList<String>>();
+            Boolean deliveryAvailble=false;
+            ArrayList<Boolean>delivery = new ArrayList<Boolean>();
+            HashMap<String,ArrayList<Boolean>> deliveryAvail=new HashMap<String ,ArrayList<Boolean>>();
             //create json object from response string
             productObjList = new ArrayList<ProductObject>();
             //JSONObject resultJson = new JSONObject(JsonStringResult);
@@ -342,17 +349,23 @@ public class JSONParser {
                         photoUrl=product.getString("photoUrl");
                         photoUrls.add(product.getString("photoUrl"));
                     }
-
+                     if(product.has("deliverable")){
+                         deliveryAvailble=product.getBoolean("deliverable");
+                         delivery.add(product.getBoolean("deliverable"));
+                     }
 
                     if(shops.containsKey(userEmail)){
                         shops.get(userEmail).add(new ProductObject(created_at, updated_at, userId, discount, description, quantity, price, productId, userEmail));
                         photos.get(userEmail).add(photoUrl);
+                        deliveryAvail.get(userEmail).add(deliveryAvailble);
                     }
                      else {
                         shops.put(userEmail,new ArrayList<ProductObject>());
                         shops.get(userEmail).add(new ProductObject(created_at, updated_at, userId, discount, description, quantity, price, productId, userEmail));
-                        photos.put(userEmail,new ArrayList<String>());
+                        photos.put(userEmail, new ArrayList<String>());
                         photos.get(userEmail).add(photoUrl);
+                        deliveryAvail.put(userEmail, new ArrayList<Boolean>());
+                        deliveryAvail.get(userEmail).add(deliveryAvailble);
                     }
 
 
@@ -361,12 +374,16 @@ public class JSONParser {
             }
             Log.i("rajat", discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " size: " + productObjList.size() + " " + message);
 //            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
-            Log.d("check",new Gson().toJson(shops));
+            Log.d("check", new Gson().toJson(shops));
             Intent intent=new Intent(con,Shops.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             Log.d("check", new Gson().toJson(shops));
             intent.putExtra("data", new Gson().toJson(shops));
-            Log.i("rajat", new Gson().toJson(photos)+"sixe" + photoUrls.size());
+            Log.i("rajat", new Gson().toJson(photos) + "sixe" + photoUrls.size());
             intent.putExtra("photoUrl", new Gson().toJson(photos));
+            Log.i("rajat", new Gson().toJson(deliveryAvail) + "deliv:" + delivery.size());
+            intent.putExtra("deliverable",new Gson().toJson(deliveryAvail));
             con.startActivity(intent);
         } catch (Exception e) {
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
@@ -411,7 +428,74 @@ public class JSONParser {
             Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
         }
     }
+    public static void UpdateProductNameApiJsonParser(String JsonStringResult, Context con) {
+        try {
 
+            JSONObject product;
+
+            String created_at = "";
+            String updated_at = "";
+            String userId = "";
+            int discount = 0;
+            String description = "";
+            int quantity = 0;
+            int price = 0;
+            String productId = "";
+            String message = "";
+            //create json object from response string
+            JSONObject resultJson = new JSONObject(JsonStringResult);
+            if (resultJson.has("newProduct")) {
+                product = resultJson.getJSONObject("newProduct");
+                discount = product.getInt("discount");
+                quantity = product.getInt("quantity");
+                price = product.getInt("price");
+                userId = product.getString("userId");
+                description = product.getString("description");
+                productId = product.getString("_id");
+                created_at = product.getString("created_at");
+                updated_at = product.getString("updated_at");
+                message = resultJson.getString("message");
+            }
+            Log.i("rajat", discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message);
+//            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
+        } catch (Exception e) {
+            Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
+        }
+    }
+    public static void UpdateProductQuantityApiJsonParser(String JsonStringResult, Context con) {
+        try {
+
+            JSONObject product;
+
+            String created_at = "";
+            String updated_at = "";
+            String userId = "";
+            int discount = 0;
+            String description = "";
+            int quantity = 0;
+            int price = 0;
+            String productId = "";
+            String message = "";
+            //create json object from response string
+            JSONObject resultJson = new JSONObject(JsonStringResult);
+            if (resultJson.has("newProduct")) {
+                product = resultJson.getJSONObject("newProduct");
+                discount = product.getInt("discount");
+                quantity = product.getInt("quantity");
+                price = product.getInt("price");
+                userId = product.getString("userId");
+                description = product.getString("description");
+                productId = product.getString("_id");
+                created_at = product.getString("created_at");
+                updated_at = product.getString("updated_at");
+                message = resultJson.getString("message");
+            }
+            Log.i("rajat", discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message);
+//            Tools.showAlertDialog(discount + " " + quantity + " " + price + " " + userId + " " + description + " " + productId + " " + message, con);
+        } catch (Exception e) {
+            Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
+        }
+    }
     public static void ChangeProductDiscountApiJsonParser(String JsonStringResult, Context con) {
         try {
 
@@ -711,6 +795,8 @@ public class JSONParser {
             Log.i("rajat", shopkeeperId + " " + customerId + " " + orderObjList.size() + " " + productId + " " + message);
 //            Tools.showAlertDialog(shopkeeperId + " " + customerId + " " + orderObjList.size() + " " + productId + " " + message, con);
             Intent intent=new Intent(con, Orders.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra("data",new Gson().toJson(orderObjList));
            intent.putExtra("userPhone",new Gson().toJson(Numbers));
            intent.putExtra("userAddress",new Gson().toJson(Addressess));
@@ -972,8 +1058,43 @@ public class JSONParser {
             //Log.i(userObj.toString()+""+subscrip_array.toString()+"");
 
             Intent intent=new Intent(con, PermissionForm.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra("shops",new Gson().toJson(shops));
             intent.putExtra("subscriptions",new Gson().toJson(subscription_list));
+            con.startActivity(intent);
+
+        } catch (Exception e) {
+            Log.i("rajat", "Exception: Login: " + e.getLocalizedMessage());
+        }
+    }
+
+
+
+    public static void FindOffersApiJsonParser(String JsonStringResult, Context con) {
+        try {
+
+            String description = "";
+
+            JSONArray offerObjArr= new JSONArray();
+            JSONObject offerObject = new JSONObject();
+            ArrayList<String> offer_list = new ArrayList<String>();
+
+            JSONObject resultJson = new JSONObject(JsonStringResult);
+            if(resultJson.has("Discounts")){
+                offerObjArr=resultJson.getJSONArray("Discounts");
+                for(int i=0;i<offerObjArr.length();i++){
+                    offerObject=offerObjArr.getJSONObject(i);
+                    if(offerObject.has("discountDescription")){
+                        description=offerObject.getString("discountDescription");
+                        offer_list.add(description);
+                    }
+                }
+            }
+            Intent intent=new Intent(con, Offers.class);//////////////////
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("offers",new Gson().toJson(offer_list));
             con.startActivity(intent);
 
         } catch (Exception e) {

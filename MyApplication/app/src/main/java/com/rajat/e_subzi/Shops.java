@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
 import com.rajat.e_subzi.gcm.QuickstartPreferences;
@@ -39,6 +43,7 @@ public class Shops extends ActionBarActivity {
     ActionBarDrawerToggle mDrawerToggle;
     public static HashMap<String , ArrayList<ProductObject>> shop_discount_details=new HashMap<String,ArrayList<ProductObject>>();
     public static HashMap<String , ArrayList<String>> photoUrl=new HashMap<String,ArrayList<String>>();
+    public static HashMap<String , ArrayList<Boolean>> deliverable=new HashMap<String,ArrayList<Boolean>>();
     ArrayList<String> shops=new ArrayList<String >();
     //ArrayList<String>photoUrls = new ArrayList<String>();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -49,7 +54,13 @@ public class Shops extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shops);
+        ActionBar actionBar;
+        actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
+        actionBar.setBackgroundDrawable(colorDrawable);
         context=Shops.this;
+        deliverable =(HashMap<String,ArrayList<Boolean>>) new Gson().fromJson(getIntent().getStringExtra("deliverable"),new TypeToken<HashMap<String ,ArrayList<Boolean>>>() {
+        }.getType());
         photoUrl = (HashMap<String,ArrayList<String>>) new Gson().fromJson(getIntent().getStringExtra("photoUrl"),new TypeToken<HashMap<String ,ArrayList<String>>>() {
         }.getType());
         shop_discount_details=(HashMap<String,ArrayList<ProductObject>>) new Gson().fromJson(getIntent().getStringExtra("data"),new TypeToken<HashMap<String ,ArrayList<ProductObject>>>() {
@@ -81,7 +92,7 @@ public class Shops extends ActionBarActivity {
             shops.add(key);
         }
 
-        ShopsAdapter adapter=new ShopsAdapter(shops,photoUrl,this);
+        ShopsAdapter adapter=new ShopsAdapter(shops,photoUrl,deliverable,this);
         ListView listView=(ListView)findViewById(R.id.shopkeeper_lists);
         listView.setAdapter(adapter);
 
@@ -114,17 +125,18 @@ public class Shops extends ActionBarActivity {
                     }
                 }
                 else if(position==4){
+                    Intent intent = new Intent(Shops.this, NotificationView.class);
+                    Shops.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), Shops.this);
+                    }else{
+                        VolleyClick.findOffersClick(Shops.this);
+                    }
 
-//                    if(pref.getString("type", "").equals("Shopkeeper"))
-//                    {
-//                        Shops.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-//                        Intent intent = new Intent(Shops.this, Login.class);
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                        Shops.this.startActivity(intent);
-//                    }else{
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),Shops.this);
-                    //}
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),Shops.this);
                 }
             }
         });
@@ -135,13 +147,16 @@ public class Shops extends ActionBarActivity {
         }else{
             list.add("Shops");
         }
-        list.add("Order");
+        list.add("Orders");
         if(pref.getString("type","").equals("Shopkeeper")){
             list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 

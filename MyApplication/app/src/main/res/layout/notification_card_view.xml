@@ -6,25 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:elevation="7dp">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 
-    <TextView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/shop_name"
-        android:gravity="center_horizontal"
-        android:layout_gravity="center_horizontal" />
-    <TextView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/order_status"
-        android:layout_gravity="center_horizontal" />
-    <ListView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="vertical"/>
 
-        android:id="@+id/item_list"></ListView>
-
-
+</RelativeLayout>
     <ListView
-        android:id="@+id/order_details_nav"
+        android:id="@+id/create_notification_nav"
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"

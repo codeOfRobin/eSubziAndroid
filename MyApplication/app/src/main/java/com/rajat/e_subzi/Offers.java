@@ -8,145 +8,107 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Objects.ProductObject;
 import com.rajat.e_subzi.Volley.VolleyClick;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.rajat.e_subzi.gcm.QuickstartPreferences;
 import com.rajat.e_subzi.gcm.RegistrationIntentService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 
-public class Discounts extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class Offers extends ActionBarActivity {
     ListView mRecyclerView;
-    ArrayList<ProductObject> productObjList;
-    ArrayList<String> photoUrls = new ArrayList<String>();
-    ArrayList<Boolean>delivery = new ArrayList<Boolean>();
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
-    ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
-    private static final String TAG = "Discounts";
-    public static Context context;
-    public static LinearLayout lay;
-    private ProgressBar mRegistrationProgressBar;
+    ActionBarDrawerToggle mDrawerToggle;
+    ArrayList<String> offers=new ArrayList<String >();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_discounts);
-        context=Discounts.this;
+        setContentView(R.layout.activity_offers);
+        //context=Offers.this;
+        offers = (ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("offers"),new TypeToken<ArrayList<String>>() {
+        }.getType());
         ActionBar actionBar;
         actionBar = getSupportActionBar();
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
         actionBar.setBackgroundDrawable(colorDrawable);
-        lay = (LinearLayout)findViewById(R.id.layout_root);
-       // ActionBar actionBar;
-        productObjList=(ArrayList<ProductObject>) new Gson().fromJson(getIntent().getStringExtra("data"),
-                new TypeToken<ArrayList<ProductObject>>() {
-                }.getType());
-        photoUrls = (ArrayList<String>) new Gson().fromJson(getIntent().getStringExtra("photoUrl"),
-                new TypeToken<ArrayList<String>>() {
-                }.getType());
-        delivery = (ArrayList<Boolean>) new Gson().fromJson(getIntent().getStringExtra("delivery"),
-                new TypeToken<ArrayList<Boolean>>() {
-                }.getType());
-        Log.i("rajat",photoUrls.size()+"rajat photo size");
-        Log.i("rajat",delivery.size()+"rajat deli size");
-       // mRegistrationProgressBar = (ProgressBar) findViewById(R.id.registrationProgressBar);
 
 
 
-        //actionBar = getSupportActionBar();
-        //ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#46B419"));
-        //actionBar.setBackgroundDrawable(colorDrawable);
-        ListView listView=(ListView)findViewById(R.id.discount_list);
-        String[] items={"Carrots ","Radish","banana","others "};
-        String[] discounts={"2% off ","2% off ","20% off ","25% off ","26% off ",};
-        if(productObjList.size()>0) {
-            DiscountListAdapter adapter = new DiscountListAdapter(productObjList,photoUrls,delivery, this);
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    //add youR code code for networking here
-                }
-            });
+        OffersAdapter adapter=new OffersAdapter(offers,this);
+        ListView listView=(ListView)findViewById(R.id.offers_lists);
+        listView.setAdapter(adapter);
 
-        }
 
-        mRecyclerView = (ListView) findViewById(R.id.discount_nav); // Assigning the RecyclerView Object to the xml View
+        mRecyclerView = (ListView) findViewById(R.id.offers_nav); // Assigning the RecyclerView Object to the xml View
         mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
-                Log.d("sheck",pref.getString("type",""));
+                Log.d("sheck", pref.getString("type", ""));
                 Log.d("check",""+position);
                 if(position==1){
                     if (pref.getString("type","").equals("Shopkeeper")) {
-                        VolleyClick.findProductsClick(pref.getString("userId", ""), Discounts.this);
+                        VolleyClick.findProductsClick(pref.getString("userId", ""), Offers.this);
                     } else {
-                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Discounts.this);
+                        VolleyClick.findDiscountsClick(pref.getString("userId",""), Offers.this);
                     }
                 }
                 else if(position==2){
-                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Discounts.this);
+                    VolleyClick.findOrdersClick(pref.getString("userId",""), pref.getString("type",""), Offers.this);
                 }
                 else if(position==3){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        Discounts.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
-                        Intent intent = new Intent(Discounts.this, Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        Discounts.this.startActivity(intent);
+                        Offers.this.getSharedPreferences("MyPrefs", 0).edit().clear().commit();
+                        Intent intent = new Intent(Offers.this, CreateDiscount.class);
+                        Offers.this.startActivity(intent);
                     } else {
-                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), Discounts.this);
+                        VolleyClick.getSubscriptionClick(pref.getString("deviceId", ""), Offers.this);
                     }
                 }
                 else if(position==4){
-                    Intent intent = new Intent(Discounts.this, NotificationView.class);
-                    Discounts.this.startActivity(intent);
+                    Intent intent = new Intent(Offers.this, NotificationView.class);
+                    Offers.this.startActivity(intent);
                 }
                 else if(position==5){
                     if (pref.getString("type", "").equals("Shopkeeper")) {
-                        VolleyClick.logoutClick(pref.getString("deviceId", ""), Discounts.this);
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), Offers.this);
                     }else{
-                        VolleyClick.findOffersClick(Discounts.this);
+                        VolleyClick.findOffersClick(Offers.this);
                     }
 
                 }else if(position==6){
-                    VolleyClick.logoutClick(pref.getString("deviceId",""),Discounts.this);
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),Offers.this);
                 }
             }
         });
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         ArrayList<String> list=new ArrayList<String >();
         if(pref.getString("type","").equals("Shopkeeper")){
-        list.add("Products");
+            list.add("Products");
         }else{
             list.add("Shops");
         }
@@ -204,15 +166,12 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
         getSupportActionBar().setHomeButtonEnabled(true);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_discounts, menu);
+        getMenuInflater().inflate(R.menu.menu_shops, menu);
         return true;
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -230,35 +189,7 @@ public class Discounts extends AppCompatActivity implements NavigationView.OnNav
         }
         return super.onOptionsItemSelected(item);
     }
-    public void placeOrder(View view){
-        Intent intent=new Intent(this,AddOrder.class);
-        Log.d("ghhjk",new Gson().toJson(productObjList));
-        intent.putExtra("data",new Gson().toJson(productObjList));
-        intent.putExtra("delivery",new Gson().toJson(delivery));
-        startActivity(intent);
-    }
 
 
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.products) {
-
-        } else if (id == R.id.order) {
-
-
-        } else if (id == R.id.preferences) {
-
-
-        } else if (id == R.id.logout) {
-
-
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }

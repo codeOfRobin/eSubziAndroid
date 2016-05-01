@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -38,6 +39,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
+import com.rajat.e_subzi.Adapter.NotificationView;
 import com.rajat.e_subzi.Volley.VolleyClick;
 
 import org.json.JSONException;
@@ -73,7 +75,7 @@ public class AddProducts extends ActionBarActivity implements AdapterView.OnItem
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
-
+    CheckBox chk;
     private static File file;
 
     private static final int REQUEST_STORAGE = 0;
@@ -127,7 +129,8 @@ imgPreview =new ImageView(AddProducts.this);
                 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter_state);
         spinner.setOnItemSelectedListener(this);
-
+        chk = (CheckBox)findViewById(R.id.deliveryAvailable);
+        chk.setChecked(true);
         mRecyclerView = (ListView) findViewById(R.id.add_nav); // Assigning the RecyclerView Object to the xml View
         mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -155,9 +158,18 @@ imgPreview =new ImageView(AddProducts.this);
                     }
                 }
                 else if(position==4){
+                    Intent intent = new Intent(AddProducts.this, NotificationView.class);
+                    AddProducts.this.startActivity(intent);
+                }
+                else if(position==5){
+                    if (pref.getString("type", "").equals("Shopkeeper")) {
+                        VolleyClick.logoutClick(pref.getString("deviceId", ""), AddProducts.this);
+                    }else{
+                        VolleyClick.findOffersClick(AddProducts.this);
+                    }
 
-                        VolleyClick.logoutClick(pref.getString("deviceId",""),AddProducts.this);
-
+                }else if(position==6){
+                    VolleyClick.logoutClick(pref.getString("deviceId",""),AddProducts.this);
                 }
             }
         });
@@ -168,13 +180,16 @@ imgPreview =new ImageView(AddProducts.this);
         }else{
             list.add("Shops");
         }
-        list.add("Order");
+        list.add("Orders");
         if(pref.getString("type","").equals("Shopkeeper")){
             list.add("Create Discount");
+            list.add("Notifications");
             list.add("Log Out");
         }
         else{
             list.add("Preferences");
+            list.add("Notifications");
+            list.add("Offers");
             list.add("Log Out");
         }
 
@@ -291,27 +306,7 @@ imgPreview =new ImageView(AddProducts.this);
             }
         }
     }
-//    private void previewCapturedImage() {
-//        try {
-//            // hide video preview
-//
-//
-//            imgPreview.setVisibility(View.VISIBLE);
-//
-//            // bimatp factory
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//
-//            // downsizing image as it throws OutOfMemory Exception for larger
-//            // images
-//            options.inSampleSize = 8;
-//            final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),
-//                    options);
-//
-//            imgPreview.setImageBitmap(bitmap);
-//        } catch (NullPointerException e) {
-//            e.printStackTrace();
-//        }
-//    }
+
     public Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
@@ -363,12 +358,14 @@ imgPreview =new ImageView(AddProducts.this);
         String discount=(String)editText.getText().toString();
         Spinner spinner=(Spinner) findViewById(R.id.spinner1);
         String amount=spinner.getSelectedItem().toString();
+        CheckBox chked = (CheckBox)findViewById(R.id.deliveryAvailable);
+        Boolean deliveryAvailable =chked.isChecked();
         //String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         if(file!=null){
             Log.i("rajat","not null2");
         }
         if(!name.equals("")&&!price.equals("")&& !amount.equals("Quantity(in kgs):")&& !discount.equals("")){
-            VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId", "0"), pref.getString("email", "0"), Integer.parseInt(discount), this, file);
+            VolleyClick.createProductClick(Integer.parseInt(price), Integer.parseInt(amount), name, pref.getString("userId", "0"), pref.getString("email", "0"), Integer.parseInt(discount),deliveryAvailable, this, file);
         }else if(name.equals("")){
             Toast.makeText(this,"Provide the product name",Toast.LENGTH_SHORT).show();
         }else if(price.equals("")) {

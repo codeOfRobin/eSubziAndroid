@@ -21,175 +21,205 @@ public class VolleyClick {
     public static void signUp(String email,String  password,String address,String phoneNum,String type,Context context){
         CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/signup";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
-            CallVolley.signUpCall(URL, context, email, password, address,phoneNum,type, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+            CallVolley.signUpCall(URL, context, email, password, address, phoneNum, type, 3);
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void loginClick(String email,String  password,Context context){
         CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/login";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.loginCall(URL, context, email, password, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
 
-    public static void createProductClick(int price ,int quantity, String description, String userId ,String userEmail,int discount,Context context, File file){
+    public static void createProductClick(int price ,int quantity, String description, String userId ,String userEmail,int discount,Boolean deliveryAvailable,Context context, File file){
         CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/products/create";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
-            CallVolley.createProductCall(URL, context, price, quantity, description, userId, userEmail, discount, 3, file);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+            CallVolley.createProductCall(URL, context, price, quantity, description, userId, userEmail, discount,deliveryAvailable, 3, file);
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void findProductsClick(String userId,Context context){
         CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/products/find";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             //VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.findProductsCall(URL, context, userId, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void findDiscountsClick(String userId,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+       CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/products/get";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.findDiscountsCall(URL, context, userId, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
+    }
+    public static void findOffersClick(Context context){
+        CheckNetwork chkNet = new CheckNetwork(context);
+        String URL = IP+"/api/discounts/get";
+        if (chkNet.checkNetwork()) {
+            VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
+            CallVolley.findOffersCall(URL, context, 3);
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void deleteProductClick(String productId,String userId,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/product/delete";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
         VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
-        CallVolley.deleteProductCall(URL, context, productId,userId, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        CallVolley.deleteProductCall(URL, context, productId, userId, 3);
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void registerDeviceClick(String regId,String email,String type,Context con){
         CheckNetwork chkNet = new CheckNetwork(con);
         String URL = IP+"/api/register";
-        //if (run) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(con).getRequestQueue().getCache().clear();
             CallVolley.registerDeviceCall(URL, con, regId, email, type, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet UnAvailable", con);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet UnAvailable", con);
+        }
     }
     public static void updatePriceClick(String productId,int price,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/updatePrice";
-//        if (!chkNet.checkNetwork()) {
+      if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.updateProductPriceCall(URL, context, productId, price, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
+    }
+    public static void updateQuantityClick(String productId,int quantity,Context context){
+        CheckNetwork chkNet = new CheckNetwork(context);
+        String URL = IP+"/api/updateQuantity";
+       if (chkNet.checkNetwork()) {
+        VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
+        CallVolley.updateProductQuantityCall(URL, context, productId, quantity, 3);
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
+    }
+    public static void updateNameClick(String productId,String name,Context context){
+        CheckNetwork chkNet = new CheckNetwork(context);
+        String URL = IP+"/api/updateName";
+       if (chkNet.checkNetwork()) {
+        VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
+        CallVolley.updateProductNameCall(URL, context, productId, name, 3);
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void changeDiscountClick(String productId,int discount,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/changeDiscount";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.changeProductDiscountCall(URL, context, productId, discount, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void createDiscountClick(String shopId,String discountDesc,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/discounts/create";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
         VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
         CallVolley.createDiscountCall(URL, context, shopId, discountDesc, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     //placeOrderCall
     public static void placeOrderClick(String customerId,String customerEmail,String shopkeeperId,ArrayList<String> productIds,ArrayList<Float> quantities,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/placeOrder";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.placeOrderCall(URL, context, customerId, customerEmail, shopkeeperId, productIds, quantities, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void changeOrderStateClick(String orderId,String orderState,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/changeOrderState";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.changeOrderStateCall(URL, context, orderId, orderState, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void changePreferencesClick(String userId,Context context,ArrayList<String> shops){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/change_order_state";
-//        if (!chkNet.checkNetwork()) {
+       if (chkNet.checkNetwork()) {
         VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
         CallVolley.changePreferencesCall(URL, context, userId, shops, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void setSubscriptionsClick(String userId,ArrayList<String> shopIds,Context context){
-//        CheckNetwork chkNet = new CheckNetwork (context);
+        CheckNetwork chkNet = new CheckNetwork (context);
         String URL = IP+"/api/setSubscriptions";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
         VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
         CallVolley.setSubscriptionsCall(URL, context, userId, shopIds, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
 
     public static void getSubscriptionClick(String deviceId,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+       CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/getSubscriptions";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
         VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
         CallVolley.getSubscriptionsCall(URL, context, deviceId, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void findOrdersClick(String userId,String usertype,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/findOrdersNotDelivered";
-//        if (!chkNet.checkNetwork()) {
+       if (chkNet.checkNetwork()) {
             VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
             CallVolley.findOrdersCall(URL, context, userId, usertype, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
     public static void logoutClick(String deviceId,Context context){
-//        CheckNetwork chkNet = new CheckNetwork(context);
+        CheckNetwork chkNet = new CheckNetwork(context);
         String URL = IP+"/api/unregister";
-//        if (!chkNet.checkNetwork()) {
+        if (chkNet.checkNetwork()) {
         VolleySingleton.getInstance(context).getRequestQueue().getCache().clear();
         CallVolley.logoutCall(URL, context, deviceId, 3);
-//        } else {
-//            Tools.showAlertDialog("Internet Available", context);
-//        }
+        } else {
+            Tools.showAlertDialog("Internet Unavailable", context);
+        }
     }
 
 }

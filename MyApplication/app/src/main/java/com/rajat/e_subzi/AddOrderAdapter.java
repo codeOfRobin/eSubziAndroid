@@ -1,6 +1,7 @@
 package com.rajat.e_subzi;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +21,11 @@ import java.util.HashMap;
 public class AddOrderAdapter extends BaseAdapter {
     ArrayList<ProductObject> discounts=new ArrayList<ProductObject>();
     Context context;
-
-    public AddOrderAdapter(ArrayList<ProductObject> discounts,Context context){
+    ArrayList<Boolean> delivery =new ArrayList<Boolean>();
+    public AddOrderAdapter(ArrayList<ProductObject> discounts,ArrayList<Boolean> delivery,Context context){
         super();
         this.discounts=discounts;
-
+        this.delivery=delivery;
         this.context=context;
     }
 
@@ -48,10 +49,20 @@ public class AddOrderAdapter extends BaseAdapter {
         TextView data = (TextView) row.findViewById(R.id.commodity);
         data.setText(discounts.get(position).getDescription());
         data=(TextView)row.findViewById(R.id.price);
-        AddOrder.data_quantity.put(discounts.get(position).getProductId(),(float) discounts.get(position).getQuantity());
+        AddOrder.data_quantity.put(discounts.get(position).getProductId(), (float) discounts.get(position).getQuantity());
         data.setText("Price : "+Integer.toString(discounts.get(position).getPrice()));
         data=(TextView)row.findViewById(R.id.discount);
         data.setText("Discount : " + Integer.toString(discounts.get(position).getDiscount()));
+        data=(TextView)row.findViewById(R.id.quantity);
+        data.setText("Quantity : "+Integer.toString(discounts.get(position).getQuantity()));
+        data=(TextView)row.findViewById(R.id.deliverable);
+        if(delivery.get(position)){
+            data.setText("Delivery Available");
+            data.setTextColor(Color.parseColor("#46b419"));
+        }else{
+            data.setText("Delivery Not Available");
+            data.setTextColor(Color.RED);
+        }
 
         Button button=(Button) row.findViewById(R.id.dec);
         button.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +88,7 @@ public class AddOrderAdapter extends BaseAdapter {
                     AddOrder.data.put(discounts.get(position).getProductId(), Float.parseFloat((String) t.getText()));
                 }
                 else{
-                    Toast.makeText(context,"quantityt limit exceede",Toast.LENGTH_LONG).show();
+                    Toast.makeText(context,"Quantity limit exceeded",Toast.LENGTH_LONG).show();
                 }
             }
         });
